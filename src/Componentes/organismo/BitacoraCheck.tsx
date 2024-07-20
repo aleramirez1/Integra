@@ -108,7 +108,7 @@ const Button = styled.button`
   }
 `;
 
-const Cheker: React.FC = () => {
+const BitacoraCheck: React.FC = () => {
   const [rows, setRows] = useState([
     { hora: '', unidad: '', lunes: false, martes: false, miercoles: false, jueves: false, viernes: false, sabado: false, domingo: false, disabled: false }
   ]);
@@ -296,4 +296,4 @@ const Cheker: React.FC = () => {
   );
 };
 
-export default Cheker;
+export default BitacoraCheck;

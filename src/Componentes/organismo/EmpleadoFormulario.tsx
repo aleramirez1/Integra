@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import '@fortawesome/fontawesome-free/css/all.min.css';
 import Swal from 'sweetalert2';
 
@@ -13,6 +13,18 @@ const EmpleadoFormulario: React.FC = () => {
   const [cards, setCards] = useState<CardProps[]>([
     { name: 'Alexia Ramirez', info1: 'Chofer', info2: '1' }
   ]);
+  const [warnings, setWarnings] = useState({
+    firstName: '',
+    lastName: '',
+    username: '',
+    email: '',
+    telNumber: '',
+    password: '',
+    confirmPassword: ''
+  });
+  const [passwordStrength, setPasswordStrength] = useState(0);
+  
+  const usernameRef = useRef<HTMLInputElement>(null);
 
   const toggleForm = () => {
     setShowForm(!showForm);
@@ -39,14 +51,88 @@ const EmpleadoFormulario: React.FC = () => {
       return;
     }
 
+    if (!/^\d{10}$/.test(telNumber.value)) {
+      showAlert('El número de teléfono debe contener exactamente 10 dígitos.');
+      return;
+    }
+
+    const passwordRegex = /(?=.*[A-Z])(?=.*\d)/;
+    if (!passwordRegex.test(password.value)) {
+      showAlert('La contraseña debe contener al menos una letra mayúscula y un dígito.');
+      return;
+    }
+
+    if (password.value !== confirmPassword.value) {
+      showAlert('Las contraseñas no coinciden.');
+      return;
+    }
+
     const newCard: CardProps = {
       name: `${firstName.value} ${lastName.value}`,
       info1: `Username: ${username.value}, Email: ${email.value}, Tel: ${telNumber.value}`,
       info2: 'Empleado 1',
     };
 
-    setCards([newCard]);
+    setCards([...cards, newCard]);
     setShowForm(false);
+  };
+
+  const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = event.target;
+    let warningMessage = '';
+
+    switch (name) {
+      case 'telNumber':
+        if (!/^\d{10}$/.test(value)) {
+          warningMessage = 'El número de teléfono debe contener exactamente 10 dígitos.';
+        }
+        break;
+      case 'password':
+        setPasswordStrength(calculatePasswordStrength(value));
+        break;
+      case 'confirmPassword':
+        const password = (document.querySelector('input[name="password"]') as HTMLInputElement).value;
+        if (value !== password) {
+          warningMessage = 'Las contraseñas no coinciden.';
+        }
+        break;
+      default:
+        if (!value) {
+          warningMessage = 'Este campo es obligatorio.';
+        }
+        break;
+    }
+
+    setWarnings({
+      ...warnings,
+      [name]: warningMessage
+    });
+  };
+
+  const handleBlurUsername = () => {
+    if (usernameRef.current) {
+      const regex = /[A-Z0-9]/;
+      if (!regex.test(usernameRef.current.value)) {
+        setWarnings({
+          ...warnings,
+          username: 'El nombre de usuario debe contener al menos una letra mayúscula o un dígito.'
+        });
+      } else {
+        setWarnings({
+          ...warnings,
+          username: ''
+        });
+      }
+    }
+  };
+
+  const calculatePasswordStrength = (password: string) => {
+    let strength = 0;
+    if (password.length >= 8) strength++;
+    if (/(?=.*[A-Z])/.test(password)) strength++;
+    if (/(?=.*\d)/.test(password)) strength++;
+    if (/(?=.*[!@#$%^&*])/.test(password)) strength++;
+    return strength;
   };
 
   const showAlert = (message: string) => {
@@ -90,28 +176,44 @@ const EmpleadoFormulario: React.FC = () => {
             <div style={styles.formWrapper}>
               <form onSubmit={handleAdd}>
                 <div style={styles.inputGroup}>
-                  <input type="text" placeholder="First Name" style={styles.inputField} name="firstName" />
-                  <input type="text" placeholder="Last Name" style={styles.inputField} name="lastName" />
+                  <input type="text" placeholder="First Name" style={styles.inputField} name="firstName" onChange={handleInputChange} />
+                  {warnings.firstName && <small style={styles.warning}>{warnings.firstName}</small>}
+                  <input type="text" placeholder="Last Name" style={styles.inputField} name="lastName" onChange={handleInputChange} />
+                  {warnings.lastName && <small style={styles.warning}>{warnings.lastName}</small>}
                 </div>
                 <div style={styles.inputWithIcon}>
                   <span style={styles.icon}><i className="fas fa-user"></i></span>
-                  <input type="text" placeholder="Username" style={styles.inputFieldFull} name="username" />
+                  <input
+                    type="text"
+                    placeholder="Username"
+                    style={styles.inputFieldFull}
+                    name="username"
+                    ref={usernameRef}
+                    onChange={handleInputChange}
+                    onBlur={handleBlurUsername}
+                  />
+                  {warnings.username && <small style={styles.warning}>{warnings.username}</small>}
                 </div>
                 <div style={styles.inputWithIcon}>
                   <span style={styles.icon}><i className="fas fa-envelope"></i></span>
-                  <input type="email" placeholder="Email" style={styles.inputFieldFull} name="email" />
+                  <input type="email" placeholder="Email" style={styles.inputFieldFull} name="email" onChange={handleInputChange} />
+                  {warnings.email && <small style={styles.warning}>{warnings.email}</small>}
                 </div>
                 <div style={styles.inputWithIcon}>
                   <span style={styles.icon}><i className="fas fa-phone"></i></span>
-                  <input type="tel" placeholder="Tel. Number" style={styles.inputFieldFull} name="telNumber" />
+                  <input type="tel" placeholder="Tel. Number" style={styles.inputFieldFull} name="telNumber" onChange={handleInputChange} />
+                  {warnings.telNumber && <small style={styles.warning}>{warnings.telNumber}</small>}
                 </div>
                 <div style={styles.inputWithIcon}>
                   <span style={styles.icon}><i className="fas fa-lock"></i></span>
-                  <input type="password" placeholder="Password" style={styles.inputFieldFull} name="password" />
+                  <input type="password" placeholder="Password" style={styles.inputFieldFull} name="password" onChange={handleInputChange} />
+                  {warnings.password && <small style={styles.warning}>{warnings.password}</small>}
+                  <div style={{ ...styles.passwordStrengthBar, backgroundColor: getPasswordStrengthColor(passwordStrength) }} />
                 </div>
                 <div style={styles.inputWithIcon}>
                   <span style={styles.icon}><i className="fas fa-lock"></i></span>
-                  <input type="password" placeholder="Confirm Password" style={styles.inputFieldFull} name="confirmPassword" />
+                  <input type="password" placeholder="Confirm Password" style={styles.inputFieldFull} name="confirmPassword" onChange={handleInputChange} />
+                  {warnings.confirmPassword && <small style={styles.warning}>{warnings.confirmPassword}</small>}
                 </div>
                 <div style={styles.buttonContainer}>
                   <button type="submit" style={styles.submitButton}>Agregar</button>
@@ -123,6 +225,21 @@ const EmpleadoFormulario: React.FC = () => {
       )}
     </div>
   );
+};
+
+const getPasswordStrengthColor = (strength: number) => {
+  switch (strength) {
+    case 1:
+      return 'red';
+    case 2:
+      return 'orange';
+    case 3:
+      return 'yellow';
+    case 4:
+      return 'green';
+    default:
+      return 'grey';
+  }
 };
 
 const styles = {
@@ -170,7 +287,9 @@ const styles = {
   cardsContainer: {
     position: 'relative' as 'relative',
     marginTop: '100px',
-    marginRight: '20px',
+    display: 'flex',
+    flexWrap: 'wrap' as 'wrap',
+    justifyContent: 'flex-end' as 'flex-end',
   },
   card: {
     backgroundColor: '#fff',
@@ -181,6 +300,7 @@ const styles = {
     height: '200px',
     textAlign: 'center' as 'center',
     marginBottom: '10px',
+    marginRight: '10px',
   },
   avatarContainer: {
     marginBottom: '20px',
@@ -261,6 +381,16 @@ const styles = {
     borderRadius: '5px',
     cursor: 'pointer',
   },
+  warning: {
+    color: 'red',
+    fontSize: '12px',
+  },
+  passwordStrengthBar: {
+    height: '5px',
+    borderRadius: '5px',
+    marginTop: '5px',
+    width: '100%',
+  }
 };
 
 export default EmpleadoFormulario;

@@ -13,8 +13,8 @@ const Login = () => {
     e.preventDefault();
     if (username === 'admin' && password === '2005') {
       navigate('/admin');
-    } else if (username === 'checador' && password === '1900') {
-      navigate('/checker');
+    } else if (username === 'checador' && password === '1800') {
+      navigate('/menucheck');
     } else if (username === 'chofer' && password === '1700') {
       navigate('/driver');
     } else {
