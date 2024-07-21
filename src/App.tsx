@@ -11,7 +11,7 @@ import HorarioFormulario from './Componentes/organismo/HorarioFormulario';
 import ProtectedRoute from './Componentes/ProtectedRoute';
 import BitacoraCheck from './Componentes/organismo/BitacoraCheck';
 import MenuCheck from './Pages/MenuCheck';
-
+import MapaChecador from './Componentes/organismo/MapaChecador';
 
 const App: React.FC = () => {
   const isAuthenticated = true; 
@@ -49,8 +49,10 @@ const App: React.FC = () => {
           path="/menucheck" 
           element={<ProtectedRoute element={<MenuCheck/>} isAuthenticated={isAuthenticated} />} 
         />
-        
-
+        <Route 
+          path="/mapa" 
+          element={<ProtectedRoute element={<MapaChecador/>} isAuthenticated={isAuthenticated} />} 
+        />
         
         <Route 
           path="/horario" 

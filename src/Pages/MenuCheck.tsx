@@ -166,7 +166,7 @@ const MenuCheck= () => {
         </MenuButton>
         <Nav>
           <NavItem to="/bita">Bitacora</NavItem>
-          <NavItem to="/">Mapa</NavItem>
+          <NavItem to="/mapa">Mapa</NavItem>
         </Nav>
       </MenuContainer>
       <OutsideImageContainer>

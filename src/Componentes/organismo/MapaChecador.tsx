@@ -8,7 +8,7 @@ const MapContainer = styled.div`
   height: 400px;
 `;
 
-const BitacoraCheck = () => {
+const MapaChecador = () => {
   const [mapLoaded, setMapLoaded] = useState(false);
 
   const handleMapLoad = () => {
@@ -32,7 +32,7 @@ const BitacoraCheck = () => {
     <div>
       <h1>Bitacora Check</h1>
       <LoadScript
-        googleMapsApiKey="YOUR_GOOGLE_MAPS_API_KEY" // Reemplaza con tu API key de Google Maps
+        googleMapsApiKey="AIzaSyBaH5Dhv_yS4ToVhfIVYVYQbdZwV-4PCJs" // Reemplaza con tu API key de Google Maps
         onLoad={handleMapLoad}
         onError={handleMapError}
       >
@@ -50,4 +50,4 @@ const BitacoraCheck = () => {
   );
 };
 
-export default BitacoraCheck;
+export default MapaChecador;
