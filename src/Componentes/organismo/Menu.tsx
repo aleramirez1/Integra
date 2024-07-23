@@ -1,11 +1,11 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { Link } from 'react-router-dom';
 import styled from 'styled-components';
 
 const MenuContainer = styled.div`
   display: flex;
   align-items: center;
-  background: linear-gradient(135deg, #5fb0d9, #81c784);
+  background: linear-gradient(135deg, #027458, #24c7af);
   padding: 30px 20px;
   width: 100%;
   box-shadow: 0 4px 8px rgba(0,0,0,0.2);
@@ -17,6 +17,9 @@ const MenuContainer = styled.div`
 
   @media (max-width: 768px) {
     padding: 5px 10px;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
   }
 `;
 
@@ -35,6 +38,7 @@ const LogoContainer = styled.div`
   @media (max-width: 768px) {
     width: 60px;
     height: 60px;
+    margin-bottom: 10px;
   }
 `;
 
@@ -52,6 +56,7 @@ const MenuContent = styled.div`
 
   @media (max-width: 768px) {
     margin: 0;
+    margin-left: 10px;
   }
 `;
 
@@ -70,7 +75,7 @@ const MenuTitle = styled.h1`
 const Nav = styled.nav`
   display: flex;
   gap: 20px;
-  order: 3; 
+  order: 3;
 
   @media (max-width: 768px) {
     flex-direction: column;
@@ -82,7 +87,6 @@ const Nav = styled.nav`
     position: absolute;
     top: 100%;
     left: 0;
-    display: none; 
   }
 `;
 
@@ -131,31 +135,36 @@ const MenuButton = styled.button`
   }
 `;
 
-const Menu = () => {
-  const [isOpen, setIsOpen] = useState(false); 
-  const logoUrl = '/nvo.png';
+const CenteredImage = styled.div`
+  width: 105%;
+  display: flex;
+  justify-content: center;
+  margin: 90px 0 20px 0; 
+`;
 
-  const toggleMenu = () => {
-    setIsOpen(!isOpen);
-  };
+const Menu = () => {
+  const logoUrl = '/nvo.png';
+  const centeredImageUrl = '/a.png'; 
 
   return (
-    <MenuContainer>
-      <LogoContainer>
-        <LogoImage src={logoUrl} alt="Logo" />
-      </LogoContainer>
-      <MenuContent>
-        <MenuTitle>TRANSPORT-COMMUNICATION</MenuTitle>
-      </MenuContent>
-      <MenuButton onClick={toggleMenu}>
-        ☰
-      </MenuButton>
-      <Nav>
-        <NavItem to="/empleados">Empleados</NavItem>
-        <NavItem to="/unidad">Unidades</NavItem>
-        <NavItem to="/horario">Horario</NavItem>
-      </Nav>
-    </MenuContainer>
+    <>
+      <MenuContainer>
+        <LogoContainer>
+          <LogoImage src={logoUrl} alt="Logo" />
+        </LogoContainer>
+        <MenuContent>
+          <MenuTitle>TRANSPORT-COMMUNICATION</MenuTitle>
+        </MenuContent>
+        <Nav>
+          <NavItem to="/empleados">Empleados</NavItem>
+          <NavItem to="/unidad">Unidades</NavItem>
+          <NavItem to="/horario">Horario</NavItem>
+        </Nav>
+      </MenuContainer>
+      <CenteredImage>
+        <img src={centeredImageUrl} alt="Centered" style={{ maxWidth: '100%' }} />
+      </CenteredImage>
+    </>
   );
 };
 
