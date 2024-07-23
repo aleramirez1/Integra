@@ -47,18 +47,16 @@ const App: React.FC = () => {
         />
         <Route 
           path="/menucheck" 
-          element={<ProtectedRoute element={<MenuCheck/>} isAuthenticated={isAuthenticated} />} 
+          element={<ProtectedRoute element={<MenuCheck />} isAuthenticated={isAuthenticated} />} 
         />
         <Route 
           path="/mapa" 
-          element={<ProtectedRoute element={<MapaChecador/>} isAuthenticated={isAuthenticated} />} 
+          element={<ProtectedRoute element={<MapaChecador />} isAuthenticated={isAuthenticated} />} 
         />
-        
         <Route 
           path="/horario" 
           element={<ProtectedRoute element={<HorarioFormulario />} isAuthenticated={isAuthenticated} />} 
         />
-        
       </Routes>
     </Router>
   );
