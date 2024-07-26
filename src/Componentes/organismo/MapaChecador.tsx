@@ -102,7 +102,8 @@ const MapaChecador: React.FC = () => {
             { lat: 16.747257956286507, lng: -93.12091447111526 },
             { lat: 16.746756775918946, lng: -93.11960602427192 },
             { lat: 16.746005002894197, lng: -93.11751250932257 }
-        ];
+        ];	
+
 
           const ruta = new google.maps.Polyline({
             path: rutaCoords,
@@ -119,6 +120,21 @@ const MapaChecador: React.FC = () => {
 
     loadGoogleMapsScript();
   }, []);
+
+  const handleActivateLocation = () => {
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(
+        (position) => {
+          alert(`Latitud: ${position.coords.latitude}, Longitud: ${position.coords.longitude}`);
+        },
+        (error) => {
+          alert('Error al obtener la localización: ' + error.message);
+        }
+      );
+    } else {
+      alert('Geolocalización no soportada por este navegador.');
+    }
+  };
 
   return (
     <div style={{ textAlign: 'center', fontFamily: 'Arial, sans-serif' }}>
@@ -171,6 +187,14 @@ const MapaChecador: React.FC = () => {
           alt="Publicidad"
           style={{ maxWidth: '100%' }}
         />
+      </div>
+      <div style={{ marginTop: '20px' }}>
+        <button 
+          onClick={handleActivateLocation}
+          style={{ padding: '10px 20px', backgroundColor: '#2d4d6c', color: 'white', border: 'none', borderRadius: '5px', cursor: 'pointer' }}
+        >
+          Activar Localización
+        </button>
       </div>
     </div>
   );
