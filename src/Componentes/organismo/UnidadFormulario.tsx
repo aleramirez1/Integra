@@ -19,13 +19,13 @@ const UnidadFormulario: React.FC = () => {
   const toggleForm = () => {
     setShowForm(!showForm);
     if (showForm) {
-      setUnidades([]); // Borrar unidades si el formulario está siendo cerrado
+      setUnidades([]); 
     }
   };
 
   const closeForm = () => {
     setShowForm(false);
-    setUnidades([]); // Borrar unidades cuando se cierra el formulario
+    setUnidades([]); 
   };
 
   const handleAdd = (event: React.FormEvent<HTMLFormElement>) => {
@@ -108,7 +108,7 @@ const UnidadFormulario: React.FC = () => {
               <i className="fas fa-times"></i>
             </CloseButton>
             <FormWrapper>
-              <Avatar src="https://via.placeholder.com/100" alt="Avatar" />
+              <Avatar src="/b11-10.jpg" alt="Avatar" />
               <form onSubmit={handleAdd}>
                 <InputGroup>
                   <InputWrapper>
@@ -182,7 +182,7 @@ const UnidadFormulario: React.FC = () => {
   );
 };
 
-// Styled Components
+
 
 const Container = styled.div`
   display: flex;
