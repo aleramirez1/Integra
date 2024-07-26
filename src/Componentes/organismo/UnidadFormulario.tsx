@@ -100,9 +100,9 @@ const UnidadFormulario: React.FC = () => {
       </div>
       <div style={styles.unidadesContainer}>
         {unidades.map((unidad, index) => (
-          <div key={index} style={styles.unidad}>
-            <div style={styles.unidadText}>
-              <h3>Unidad {unidad.numeroUnidad}</h3>
+          <div key={index} style={styles.card}>
+            <div style={styles.cardText}>
+              <h3>{unidad.numeroUnidad}</h3>
               <p>Número de Serie: {unidad.numeroSerie}</p>
               <p>Número de Placa: {unidad.numeroPlaca}</p>
               <p>Marca: {unidad.marca}</p>
@@ -119,19 +119,43 @@ const UnidadFormulario: React.FC = () => {
             <div style={styles.formWrapper}>
               <form onSubmit={handleAdd}>
                 <div style={styles.inputGroup}>
-                  <input type="text" placeholder="Número de unidad" style={styles.inputField} name="numeroUnidad" onChange={handleInputChange} />
+                  <input
+                    type="text"
+                    placeholder="Número de unidad"
+                    style={styles.inputField}
+                    name="numeroUnidad"
+                    onChange={handleInputChange}
+                  />
                   {warnings.numeroUnidad && <small style={styles.warning}>{warnings.numeroUnidad}</small>}
                 </div>
                 <div style={styles.inputGroup}>
-                  <input type="text" placeholder="Número de serie" style={styles.inputField} name="numeroSerie" onChange={handleInputChange} />
+                  <input
+                    type="text"
+                    placeholder="Número de serie"
+                    style={styles.inputField}
+                    name="numeroSerie"
+                    onChange={handleInputChange}
+                  />
                   {warnings.numeroSerie && <small style={styles.warning}>{warnings.numeroSerie}</small>}
                 </div>
                 <div style={styles.inputGroup}>
-                  <input type="text" placeholder="Número de placa" style={styles.inputField} name="numeroPlaca" onChange={handleInputChange} />
+                  <input
+                    type="text"
+                    placeholder="Número de placa"
+                    style={styles.inputField}
+                    name="numeroPlaca"
+                    onChange={handleInputChange}
+                  />
                   {warnings.numeroPlaca && <small style={styles.warning}>{warnings.numeroPlaca}</small>}
                 </div>
                 <div style={styles.inputGroup}>
-                  <input type="text" placeholder="Marca" style={styles.inputField} name="marca" onChange={handleInputChange} />
+                  <input
+                    type="text"
+                    placeholder="Marca"
+                    style={styles.inputField}
+                    name="marca"
+                    onChange={handleInputChange}
+                  />
                   {warnings.marca && <small style={styles.warning}>{warnings.marca}</small>}
                 </div>
                 <div style={styles.buttonContainer}>
@@ -152,7 +176,7 @@ const styles = {
     flexDirection: 'column' as 'column',
     alignItems: 'center' as 'center',
     height: '100vh',
-    backgroundColor: '#e0e7d9',
+    backgroundColor: '#f8f9fa',
     position: 'relative' as 'relative',
   },
   header: {
@@ -160,23 +184,24 @@ const styles = {
     display: 'flex',
     justifyContent: 'flex-end' as 'flex-end',
     padding: '10px',
-    backgroundColor: '#fff',
+    backgroundColor: '#ffffff',
     boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)',
     position: 'fixed' as 'fixed',
     top: 0,
     zIndex: 1000,
   },
   addButton: {
-    backgroundColor: '#4CAF50',
-    color: '#fff',
+    backgroundColor: '#007bff',
+    color: '#ffffff',
     border: 'none',
     borderRadius: '50%',
-    width: '40px',
-    height: '40px',
+    width: '30px',
+    height: '30px',
     cursor: 'pointer',
     display: 'flex',
     justifyContent: 'center' as 'center',
     alignItems: 'center' as 'center',
+    fontSize: '16px',
   },
   closeButton: {
     position: 'absolute' as 'absolute',
@@ -190,23 +215,23 @@ const styles = {
   },
   unidadesContainer: {
     position: 'relative' as 'relative',
-    marginTop: '100px',
+    marginTop: '60px',
     display: 'flex',
     flexWrap: 'wrap' as 'wrap',
     justifyContent: 'flex-end' as 'flex-end',
   },
-  unidad: {
-    backgroundColor: '#fff',
+  card: {
+    backgroundColor: '#ffffff',
     padding: '10px',
-    borderRadius: '10px',
+    borderRadius: '8px',
     boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)',
-    width: '180px',
-    height: '200px',
+    width: '160px',
+    height: '180px',
     textAlign: 'center' as 'center',
     marginBottom: '10px',
     marginRight: '10px',
   },
-  unidadText: {
+  cardText: {
     textAlign: 'center' as 'center',
   },
   overlayContainer: {
@@ -222,7 +247,7 @@ const styles = {
     alignItems: 'center' as 'center',
   },
   formContainer: {
-    backgroundColor: '#fff',
+    backgroundColor: '#ffffff',
     padding: '20px',
     borderRadius: '10px',
     boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)',
@@ -239,27 +264,29 @@ const styles = {
     marginBottom: '10px',
   },
   inputField: {
+    padding: '8px',
+    border: '1px solid #ddd',
+    borderRadius: '5px',
     width: '100%',
-    padding: '10px',
-    border: '1px solid #ccc',
-    borderRadius: '5px',
-    marginBottom: '10px',
-  },
-  buttonContainer: {
-    textAlign: 'right' as 'right',
-    marginTop: '10px',
-  },
-  submitButton: {
-    padding: '10px 20px',
-    backgroundColor: '#4CAF50',
-    color: '#fff',
-    border: 'none',
-    borderRadius: '5px',
-    cursor: 'pointer',
+    fontSize: '14px',
   },
   warning: {
     color: 'red',
     fontSize: '12px',
+    marginTop: '5px',
+  },
+  buttonContainer: {
+    display: 'flex',
+    justifyContent: 'center' as 'center',
+  },
+  submitButton: {
+    backgroundColor: '#4CAF50',
+    color: '#fff',
+    border: 'none',
+    borderRadius: '5px',
+    padding: '10px 20px',
+    cursor: 'pointer',
+    fontSize: '14px',
   },
 };
 
