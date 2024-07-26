@@ -106,7 +106,7 @@ const UnidadFormulario: React.FC = () => {
     if (!value) {
       warningMessage = 'Este campo es obligatorio.';
     } else if (!/^\d+$/.test(value) && name === 'numeroPlaca') {
-      warningMessage = 'Número de placa debe contener solo números.';
+      warningMessage = 'Numero de placa debe contener solo números.';
     }
 
     setWarning(warningMessage);
@@ -145,8 +145,8 @@ const UnidadFormulario: React.FC = () => {
 
   const handleDelete = (index: number) => {
     Swal.fire({
-      title: '¿Estás seguro?',
-      text: 'No podrás revertir esto.',
+      title: '¿Estas seguro?',
+      text: 'No podras revertir esto.',
       icon: 'warning',
       showCancelButton: true,
       confirmButtonColor: '#3085d6',
@@ -268,7 +268,7 @@ const UnidadFormulario: React.FC = () => {
                     <FaTruck className="icon" />
                     <InputField
                       type="text"
-                      placeholder="Unidad"
+                      placeholder="unidad"
                       name="unidad"
                       value={formData.unidad}
                       onChange={handleInputChange}
@@ -336,7 +336,7 @@ const Card = styled.div`
   border-radius: 8px;
   padding: 10px;
   margin: 10px;
-  width: 100%;
+  width: 90%;
   display: flex;
   flex-direction: column;
   align-items: center;
