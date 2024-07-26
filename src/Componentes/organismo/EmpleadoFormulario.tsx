@@ -70,7 +70,7 @@ const EmpleadoFormulario: React.FC = () => {
     const newCard: CardProps = {
       name: `${firstName.value} ${lastName.value}`,
       info1: `Username: ${username.value}, Email: ${email.value}, Tel: ${telNumber.value}`,
-      info2: 'Empleado 1',
+      info2: 'Empleado',
     };
 
     setCards([...cards, newCard]);
@@ -115,7 +115,7 @@ const EmpleadoFormulario: React.FC = () => {
       if (!regex.test(usernameRef.current.value)) {
         setWarnings({
           ...warnings,
-          username: 'El nombre de usuario debe contener al menos una letra mayúscula o un dígito.'
+          username: 'El nombre de usuario debe contener al menos una letra mayuscula o un digito.'
         });
       } else {
         setWarnings({
