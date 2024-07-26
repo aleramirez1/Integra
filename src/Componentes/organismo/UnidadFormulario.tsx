@@ -1,53 +1,45 @@
 import React, { useState } from 'react';
-import '@fortawesome/fontawesome-free/css/all.min.css';
+import styled from 'styled-components';
+import { FaCar, FaHashtag, FaUser, FaTruck, FaTrademark } from 'react-icons/fa';
 import Swal from 'sweetalert2';
 
 interface UnidadProps {
-  numeroUnidad: string;
-  numeroSerie: string;
   numeroPlaca: string;
+  numeroSerie: string;
+  nombreChofer: string;
+  unidad: string;
   marca: string;
 }
 
 const UnidadFormulario: React.FC = () => {
   const [showForm, setShowForm] = useState(false);
   const [unidades, setUnidades] = useState<UnidadProps[]>([]);
-  const [warnings, setWarnings] = useState({
-    numeroUnidad: '',
-    numeroSerie: '',
-    numeroPlaca: '',
-    marca: ''
-  });
+  const [warning, setWarning] = useState('');
 
   const toggleForm = () => {
     setShowForm(!showForm);
+    if (showForm) {
+      setUnidades([]); // Borrar unidades si el formulario está siendo cerrado
+    }
   };
 
   const closeForm = () => {
     setShowForm(false);
+    setUnidades([]); // Borrar unidades cuando se cierra el formulario
   };
 
   const handleAdd = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
 
     const form = event.target as HTMLFormElement;
-    const numeroUnidad = form.elements.namedItem('numeroUnidad') as HTMLInputElement;
-    const numeroSerie = form.elements.namedItem('numeroSerie') as HTMLInputElement;
     const numeroPlaca = form.elements.namedItem('numeroPlaca') as HTMLInputElement;
+    const numeroSerie = form.elements.namedItem('numeroSerie') as HTMLInputElement;
+    const nombreChofer = form.elements.namedItem('nombreChofer') as HTMLInputElement;
+    const unidad = form.elements.namedItem('unidad') as HTMLInputElement;
     const marca = form.elements.namedItem('marca') as HTMLInputElement;
 
-    if (!numeroUnidad.value || !numeroSerie.value || !numeroPlaca.value || !marca.value) {
+    if (!numeroPlaca.value || !numeroSerie.value || !nombreChofer.value || !unidad.value || !marca.value) {
       showAlert('Por favor, complete todos los campos.');
-      return;
-    }
-
-    if (!/^\d+$/.test(numeroUnidad.value)) {
-      showAlert('Número de unidad debe contener solo números.');
-      return;
-    }
-
-    if (!/^\d+$/.test(numeroSerie.value)) {
-      showAlert('Número de serie debe contener solo números.');
       return;
     }
 
@@ -57,10 +49,11 @@ const UnidadFormulario: React.FC = () => {
     }
 
     const newUnidad: UnidadProps = {
-      numeroUnidad: numeroUnidad.value,
-      numeroSerie: numeroSerie.value,
       numeroPlaca: numeroPlaca.value,
-      marca: marca.value
+      numeroSerie: numeroSerie.value,
+      nombreChofer: nombreChofer.value,
+      unidad: unidad.value,
+      marca: marca.value,
     };
 
     setUnidades([...unidades, newUnidad]);
@@ -68,19 +61,16 @@ const UnidadFormulario: React.FC = () => {
   };
 
   const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = event.target;
+    const { value } = event.target;
     let warningMessage = '';
 
     if (!value) {
       warningMessage = 'Este campo es obligatorio.';
-    } else if ((name === 'numeroUnidad' || name === 'numeroSerie' || name === 'numeroPlaca') && !/^\d+$/.test(value)) {
-      warningMessage = 'Este campo debe contener solo números.';
+    } else if (!/^\d+$/.test(value) && event.target.name === 'numeroPlaca') {
+      warningMessage = 'Número de placa debe contener solo números.';
     }
 
-    setWarnings({
-      ...warnings,
-      [name]: warningMessage
-    });
+    setWarning(warningMessage);
   };
 
   const showAlert = (message: string) => {
@@ -92,202 +82,278 @@ const UnidadFormulario: React.FC = () => {
   };
 
   return (
-    <div style={styles.container}>
-      <div style={styles.header}>
-        <button style={styles.addButton} onClick={toggleForm}>
+    <Container>
+      <Header>
+        <AddButton onClick={toggleForm}>
           <i className="fas fa-plus"></i>
-        </button>
-      </div>
-      <div style={styles.unidadesContainer}>
+        </AddButton>
+      </Header>
+      <UnidadesContainer>
         {unidades.map((unidad, index) => (
-          <div key={index} style={styles.card}>
-            <div style={styles.cardText}>
-              <h3>{unidad.numeroUnidad}</h3>
-              <p>Número de Serie: {unidad.numeroSerie}</p>
-              <p>Número de Placa: {unidad.numeroPlaca}</p>
-              <p>Marca: {unidad.marca}</p>
-            </div>
-          </div>
+          <Card key={index}>
+            <CardText>
+              <h3>Número de Placa: {unidad.numeroPlaca}</h3>
+              <h3>Número de Serie: {unidad.numeroSerie}</h3>
+              <h3>Nombre del Chofer: {unidad.nombreChofer}</h3>
+              <h3>Unidad: {unidad.unidad}</h3>
+              <h3>Marca: {unidad.marca}</h3>
+            </CardText>
+          </Card>
         ))}
-      </div>
+      </UnidadesContainer>
       {showForm && (
-        <div style={styles.overlayContainer}>
-          <div style={styles.formContainer}>
-            <button style={styles.closeButton} onClick={closeForm}>
+        <OverlayContainer>
+          <FormContainer>
+            <CloseButton onClick={closeForm}>
               <i className="fas fa-times"></i>
-            </button>
-            <div style={styles.formWrapper}>
+            </CloseButton>
+            <FormWrapper>
+              <Avatar src="https://via.placeholder.com/100" alt="Avatar" />
               <form onSubmit={handleAdd}>
-                <div style={styles.inputGroup}>
-                  <input
-                    type="text"
-                    placeholder="Número de unidad"
-                    style={styles.inputField}
-                    name="numeroUnidad"
-                    onChange={handleInputChange}
-                  />
-                  {warnings.numeroUnidad && <small style={styles.warning}>{warnings.numeroUnidad}</small>}
-                </div>
-                <div style={styles.inputGroup}>
-                  <input
-                    type="text"
-                    placeholder="Número de serie"
-                    style={styles.inputField}
-                    name="numeroSerie"
-                    onChange={handleInputChange}
-                  />
-                  {warnings.numeroSerie && <small style={styles.warning}>{warnings.numeroSerie}</small>}
-                </div>
-                <div style={styles.inputGroup}>
-                  <input
-                    type="text"
-                    placeholder="Número de placa"
-                    style={styles.inputField}
-                    name="numeroPlaca"
-                    onChange={handleInputChange}
-                  />
-                  {warnings.numeroPlaca && <small style={styles.warning}>{warnings.numeroPlaca}</small>}
-                </div>
-                <div style={styles.inputGroup}>
-                  <input
-                    type="text"
-                    placeholder="Marca"
-                    style={styles.inputField}
-                    name="marca"
-                    onChange={handleInputChange}
-                  />
-                  {warnings.marca && <small style={styles.warning}>{warnings.marca}</small>}
-                </div>
-                <div style={styles.buttonContainer}>
-                  <button type="submit" style={styles.submitButton}>Agregar</button>
-                </div>
+                <InputGroup>
+                  <InputWrapper>
+                    <FaCar className="icon" />
+                    <InputField
+                      type="text"
+                      placeholder="Número de placa"
+                      name="numeroPlaca"
+                      onChange={handleInputChange}
+                    />
+                  </InputWrapper>
+                  {warning && <Warning>{warning}</Warning>}
+                </InputGroup>
+                <InputGroup>
+                  <InputWrapper>
+                    <FaHashtag className="icon" />
+                    <InputField
+                      type="text"
+                      placeholder="Número de serie"
+                      name="numeroSerie"
+                      onChange={handleInputChange}
+                    />
+                  </InputWrapper>
+                  {warning && <Warning>{warning}</Warning>}
+                </InputGroup>
+                <InputGroup>
+                  <InputWrapper>
+                    <FaUser className="icon" />
+                    <InputField
+                      type="text"
+                      placeholder="Nombre del chofer"
+                      name="nombreChofer"
+                      onChange={handleInputChange}
+                    />
+                  </InputWrapper>
+                  {warning && <Warning>{warning}</Warning>}
+                </InputGroup>
+                <InputGroup>
+                  <InputWrapper>
+                    <FaTruck className="icon" />
+                    <InputField
+                      type="text"
+                      placeholder="Unidad"
+                      name="unidad"
+                      onChange={handleInputChange}
+                    />
+                  </InputWrapper>
+                  {warning && <Warning>{warning}</Warning>}
+                </InputGroup>
+                <InputGroup>
+                  <InputWrapper>
+                    <FaTrademark className="icon" />
+                    <InputField
+                      type="text"
+                      placeholder="Marca"
+                      name="marca"
+                      onChange={handleInputChange}
+                    />
+                  </InputWrapper>
+                  {warning && <Warning>{warning}</Warning>}
+                </InputGroup>
+                <ButtonContainer>
+                  <SubmitButton type="submit">Agregar</SubmitButton>
+                </ButtonContainer>
               </form>
-            </div>
-          </div>
-        </div>
+            </FormWrapper>
+          </FormContainer>
+        </OverlayContainer>
       )}
-    </div>
+    </Container>
   );
 };
 
-const styles = {
-  container: {
-    display: 'flex',
-    flexDirection: 'column' as 'column',
-    alignItems: 'center' as 'center',
-    height: '100vh',
-    backgroundColor: '#f8f9fa',
-    position: 'relative' as 'relative',
-  },
-  header: {
-    width: '100%',
-    display: 'flex',
-    justifyContent: 'flex-end' as 'flex-end',
-    padding: '10px',
-    backgroundColor: '#ffffff',
-    boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)',
-    position: 'fixed' as 'fixed',
-    top: 0,
-    zIndex: 1000,
-  },
-  addButton: {
-    backgroundColor: '#007bff',
-    color: '#ffffff',
-    border: 'none',
-    borderRadius: '50%',
-    width: '30px',
-    height: '30px',
-    cursor: 'pointer',
-    display: 'flex',
-    justifyContent: 'center' as 'center',
-    alignItems: 'center' as 'center',
-    fontSize: '16px',
-  },
-  closeButton: {
-    position: 'absolute' as 'absolute',
-    top: '10px',
-    right: '10px',
-    backgroundColor: 'transparent',
-    border: 'none',
-    cursor: 'pointer',
-    color: '#333',
-    fontSize: '20px',
-  },
-  unidadesContainer: {
-    position: 'relative' as 'relative',
-    marginTop: '60px',
-    display: 'flex',
-    flexWrap: 'wrap' as 'wrap',
-    justifyContent: 'flex-end' as 'flex-end',
-  },
-  card: {
-    backgroundColor: '#ffffff',
-    padding: '10px',
-    borderRadius: '8px',
-    boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)',
-    width: '160px',
-    height: '180px',
-    textAlign: 'center' as 'center',
-    marginBottom: '10px',
-    marginRight: '10px',
-  },
-  cardText: {
-    textAlign: 'center' as 'center',
-  },
-  overlayContainer: {
-    position: 'fixed' as 'fixed',
-    top: 0,
-    left: 0,
-    width: '100%',
-    height: '100%',
-    backgroundColor: 'rgba(0, 0, 0, 0.5)',
-    zIndex: 1000,
-    display: 'flex',
-    justifyContent: 'center' as 'center',
-    alignItems: 'center' as 'center',
-  },
-  formContainer: {
-    backgroundColor: '#ffffff',
-    padding: '20px',
-    borderRadius: '10px',
-    boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)',
-    width: '300px',
-    textAlign: 'center' as 'center',
-    position: 'relative' as 'relative',
-  },
-  formWrapper: {
-    width: '100%',
-  },
-  inputGroup: {
-    display: 'flex',
-    flexDirection: 'column' as 'column',
-    marginBottom: '10px',
-  },
-  inputField: {
-    padding: '8px',
-    border: '1px solid #ddd',
-    borderRadius: '5px',
-    width: '100%',
-    fontSize: '14px',
-  },
-  warning: {
-    color: 'red',
-    fontSize: '12px',
-    marginTop: '5px',
-  },
-  buttonContainer: {
-    display: 'flex',
-    justifyContent: 'center' as 'center',
-  },
-  submitButton: {
-    backgroundColor: '#4CAF50',
-    color: '#fff',
-    border: 'none',
-    borderRadius: '5px',
-    padding: '10px 20px',
-    cursor: 'pointer',
-    fontSize: '14px',
-  },
-};
+// Styled Components
+
+const Container = styled.div`
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  height: 100vh;
+  background-color: #f0f4f8;
+  position: relative;
+  padding-top: 50px;
+`;
+
+const Header = styled.div`
+  width: 100%;
+  display: flex;
+  justify-content: flex-end;
+  padding: 10px;
+  background-color: #ffffff;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  position: fixed;
+  top: 0;
+  z-index: 1000;
+`;
+
+const AddButton = styled.button`
+  background-color: #007bff;
+  color: #ffffff;
+  border: none;
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  cursor: pointer;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 20px;
+  transition: background-color 0.3s, transform 0.3s;
+
+  &:hover {
+    background-color: #0056b3;
+    transform: scale(1.1);
+  }
+`;
+
+const CloseButton = styled.button`
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  background-color: transparent;
+  border: none;
+  cursor: pointer;
+  color: #333;
+  font-size: 24px;
+`;
+
+const UnidadesContainer = styled.div`
+  position: relative;
+  margin-top: 20px;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+`;
+
+const Card = styled.div`
+  background-color: #ffffff;
+  padding: 15px;
+  border-radius: 8px;
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1);
+  width: 250px;
+  height: 180px;
+  text-align: center;
+  margin-bottom: 15px;
+  margin-right: 15px;
+  transition: transform 0.3s, box-shadow 0.3s;
+
+  &:hover {
+    transform: scale(1.05);
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+  }
+`;
+
+const CardText = styled.div`
+  text-align: center;
+`;
+
+const OverlayContainer = styled.div`
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+  z-index: 1000;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+`;
+
+const FormContainer = styled.div`
+  background-color: #ffffff;
+  padding: 20px;
+  border-radius: 10px;
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1);
+  width: 300px;
+  text-align: center;
+  position: relative;
+`;
+
+const FormWrapper = styled.div`
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+`;
+
+const Avatar = styled.img`
+  width: 100px;
+  height: 100px;
+  border-radius: 50%;
+  margin-bottom: 20px;
+`;
+
+const InputGroup = styled.div`
+  width: 100%;
+  margin-bottom: 10px;
+`;
+
+const InputWrapper = styled.div`
+  display: flex;
+  align-items: center;
+  background-color: #f0f0f0;
+  border-radius: 5px;
+  padding: 5px 10px;
+
+  .icon {
+    margin-right: 10px;
+  }
+`;
+
+const InputField = styled.input`
+  width: 100%;
+  border: none;
+  background-color: transparent;
+  padding: 10px 5px;
+  font-size: 16px;
+  outline: none;
+`;
+
+const Warning = styled.span`
+  color: red;
+  font-size: 12px;
+`;
+
+const ButtonContainer = styled.div`
+  display: flex;
+  justify-content: center;
+  margin-top: 15px;
+`;
+
+const SubmitButton = styled.button`
+  background-color: #007bff;
+  color: #ffffff;
+  border: none;
+  border-radius: 5px;
+  padding: 10px 20px;
+  cursor: pointer;
+  font-size: 16px;
+  transition: background-color 0.3s, transform 0.3s;
+
+  &:hover {
+    background-color: #0056b3;
+    transform: scale(1.05);
+  }
+`;
 
 export default UnidadFormulario;
