@@ -37,7 +37,7 @@ const UnidadFormulario: React.FC = () => {
 
   const toggleForm = () => {
     setShowForm(!showForm);
-    if (showForm) {
+    if (!showForm) {
       setUnidades([]);
       resetFormData();
     }
@@ -45,9 +45,8 @@ const UnidadFormulario: React.FC = () => {
 
   const closeForm = () => {
     setShowForm(false);
-    setUnidades([]);
-    setEditIndex(null);
     resetFormData();
+    setEditIndex(null);
   };
 
   const resetFormData = () => {
@@ -293,7 +292,9 @@ const UnidadFormulario: React.FC = () => {
                   {warning && <Warning>{warning}</Warning>}
                 </InputGroup>
                 <ButtonContainer>
-                  <SubmitButton type="submit">Guardar</SubmitButton>
+                  <SubmitButton type="submit">
+                    {editIndex !== null ? 'Actualizar' : 'Agregar'}
+                  </SubmitButton>
                   <CancelButton type="button" onClick={closeForm}>
                     Cancelar
                   </CancelButton>
@@ -309,86 +310,111 @@ const UnidadFormulario: React.FC = () => {
 
 const Container = styled.div`
   width: 100%;
-  max-width: 1200px;
-  margin: 0 auto;
-  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 `;
 
 const Header = styled.div`
+  width: 100%;
   display: flex;
   justify-content: flex-end;
+  padding: 1rem;
 `;
 
 const AddButton = styled.button`
-  background-color: #007bff;
-  color: #fff;
+  background-color: #4caf50;
+  color: white;
   border: none;
   padding: 10px 20px;
   font-size: 16px;
   cursor: pointer;
-  border-radius: 5px;
+  border-radius: 4px;
+
   &:hover {
-    background-color: #0056b3;
+    background-color: #45a049;
+  }
+
+  .fas {
+    margin-right: 5px;
   }
 `;
 
 const UnidadesContainer = styled.div`
   display: flex;
   flex-wrap: wrap;
-  justify-content: space-between;
+  justify-content: center;
+  gap: 1rem;
 `;
 
 const Card = styled.div`
-  background-color: #fff;
-  border: 1px solid #ddd;
-  border-radius: 5px;
-  padding: 20px;
-  width: 30%;
-  margin: 10px 0;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  background-color: white;
+  border-radius: 10px;
+  padding: 1rem;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  width: 250px;
+  transition: transform 0.2s;
+
+  &:hover {
+    transform: scale(1.05);
+  }
 `;
 
 const Avatar = styled.img`
-  width: 50px;
-  height: 50px;
+  width: 100px;
+  height: 100px;
   border-radius: 50%;
-  margin-right: 10px;
+  margin-bottom: 1rem;
 `;
 
 const CardText = styled.div`
-  display: flex;
-  flex-direction: column;
   h3 {
-    margin: 5px 0;
+    margin: 0.5rem 0;
   }
 `;
 
 const CardActions = styled.div`
   display: flex;
   justify-content: space-between;
+  width: 100%;
+  margin-top: 1rem;
 `;
 
 const EditButton = styled.button`
-  background-color: #28a745;
-  color: #fff;
+  background-color: #ffc107;
+  color: white;
   border: none;
-  padding: 5px 10px;
+  padding: 10px;
+  border-radius: 50%;
   cursor: pointer;
-  border-radius: 5px;
+
   &:hover {
-    background-color: #218838;
+    background-color: #e0a800;
+  }
+
+  svg {
+    font-size: 16px;
   }
 `;
 
 const DeleteButton = styled.button`
-  background-color: #dc3545;
-  color: #fff;
+  background-color: #f44336;
+  color: white;
   border: none;
-  padding: 5px 10px;
+  padding: 10px;
+  border-radius: 50%;
   cursor: pointer;
-  border-radius: 5px;
+
   &:hover {
-    background-color: #c82333;
+    background-color: #d32f2f;
+  }
+
+  svg {
+    font-size: 16px;
   }
 `;
 
@@ -398,31 +424,30 @@ const OverlayContainer = styled.div`
   left: 0;
   width: 100%;
   height: 100%;
-  background-color: rgba(0, 0, 0, 0.5);
   display: flex;
-  align-items: center;
   justify-content: center;
+  align-items: center;
+  background: rgba(0, 0, 0, 0.6);
+  z-index: 1000;
 `;
 
 const FormContainer = styled.div`
-  background-color: #fff;
+  background-color: white;
+  padding: 2rem;
   border-radius: 10px;
-  padding: 20px;
-  width: 500px;
-  max-width: 90%;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
   position: relative;
 `;
 
 const CloseButton = styled.button`
-  background-color: transparent;
+  background: none;
   border: none;
   color: #000;
-  font-size: 20px;
-  cursor: pointer;
+  font-size: 1.5rem;
   position: absolute;
-  top: 10px;
-  right: 10px;
+  top: 1rem;
+  right: 1rem;
+  cursor: pointer;
 `;
 
 const FormWrapper = styled.div`
@@ -434,93 +459,118 @@ const FormWrapper = styled.div`
 const AvatarContainer = styled.div`
   display: flex;
   align-items: center;
-  margin-bottom: 20px;
+  margin-bottom: 1rem;
 `;
 
 const AvatarButton = styled.button`
-  background-color: #007bff;
-  color: #fff;
+  background-color: #4caf50;
+  color: white;
   border: none;
   border-radius: 50%;
-  width: 30px;
-  height: 30px;
-  font-size: 20px;
-  cursor: pointer;
+  width: 40px;
+  height: 40px;
+  font-size: 24px;
   display: flex;
   align-items: center;
   justify-content: center;
+  cursor: pointer;
+  margin-left: 1rem;
+
   &:hover {
-    background-color: #0056b3;
+    background-color: #45a049;
   }
 `;
 
 const AvatarsList = styled.div`
   display: flex;
-  flex-wrap: wrap;
   justify-content: center;
-  margin-bottom: 20px;
+  flex-wrap: wrap;
+  margin-bottom: 1rem;
 `;
 
 const AvatarOption = styled.div`
+  margin: 0.5rem;
   cursor: pointer;
-  margin: 5px;
+
+  img {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    border: 2px solid transparent;
+    transition: border-color 0.2s;
+
+    &:hover {
+      border-color: #4caf50;
+    }
+  }
 `;
 
 const InputGroup = styled.div`
   width: 100%;
-  margin-bottom: 20px;
+  margin-bottom: 1rem;
+  position: relative;
 `;
 
 const InputWrapper = styled.div`
   display: flex;
   align-items: center;
-  border: 1px solid #ddd;
-  padding: 10px;
-  border-radius: 5px;
 `;
 
 const InputField = styled.input`
-  border: none;
-  outline: none;
   width: 100%;
-  margin-left: 10px;
+  padding: 0.5rem 0.75rem;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  font-size: 1rem;
+  margin-left: 0.5rem;
+  flex: 1;
+
+  &:focus {
+    outline: none;
+    border-color: #4caf50;
+  }
 `;
 
 const Warning = styled.span`
-  color: #dc3545;
-  font-size: 12px;
-  margin-top: 5px;
+  color: red;
+  font-size: 0.8rem;
+  position: absolute;
+  bottom: -20px;
+  left: 0;
 `;
 
 const ButtonContainer = styled.div`
   display: flex;
-  justify-content: space-between;
-  width: 100%;
+  justify-content: center;
+  margin-top: 1rem;
 `;
 
 const SubmitButton = styled.button`
-  background-color: #28a745;
-  color: #fff;
+  background-color: #4caf50;
+  color: white;
   border: none;
   padding: 10px 20px;
   font-size: 16px;
   cursor: pointer;
-  border-radius: 5px;
+  border-radius: 4px;
+  margin-right: 0.5rem;
+
   &:hover {
-    background-color: #218838;
+    background-color: #45a049;
   }
 `;
 
 const CancelButton = styled.button`
-  background-color: #dc3545;
-  color: #fff;
+  background-color: #f44336;
+  color: white;
   border: none;
   padding: 10px 20px;
   font-size: 16px;
   cursor: pointer;
-  border-radius: 5px;
+  border-radius: 4px;
+
   &:hover {
-    background-color: #c82333;
+    background-color: #d32f2f;
   }
 `;
 
