@@ -1,6 +1,6 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import styled from 'styled-components';
-import { FaCar, FaHashtag, FaUser, FaTruck, FaTrademark } from 'react-icons/fa';
+import { FaCar, FaHashtag, FaUser, FaTruck, FaTrademark, FaEdit, FaTrash } from 'react-icons/fa';
 import Swal from 'sweetalert2';
 
 interface UnidadProps {
@@ -18,6 +18,15 @@ const UnidadFormulario: React.FC = () => {
   const [warning, setWarning] = useState('');
   const [showAvatars, setShowAvatars] = useState(false);
   const [selectedAvatar, setSelectedAvatar] = useState('/b11-10.jpg');
+  const [editIndex, setEditIndex] = useState<number | null>(null);
+
+  const [formData, setFormData] = useState({
+    numeroPlaca: '',
+    numeroSerie: '',
+    nombreChofer: '',
+    unidad: '',
+    marca: '',
+  });
 
   const avatars = [
     '/1-removebg-preview.png',
@@ -30,54 +39,74 @@ const UnidadFormulario: React.FC = () => {
     setShowForm(!showForm);
     if (showForm) {
       setUnidades([]);
+      resetFormData();
     }
   };
 
   const closeForm = () => {
     setShowForm(false);
     setUnidades([]);
+    setEditIndex(null);
+    resetFormData();
+  };
+
+  const resetFormData = () => {
+    setFormData({
+      numeroPlaca: '',
+      numeroSerie: '',
+      nombreChofer: '',
+      unidad: '',
+      marca: '',
+    });
+    setSelectedAvatar('/b11-10.jpg');
   };
 
   const handleAdd = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
 
-    const form = event.target as HTMLFormElement;
-    const numeroPlaca = form.elements.namedItem('numeroPlaca') as HTMLInputElement;
-    const numeroSerie = form.elements.namedItem('numeroSerie') as HTMLInputElement;
-    const nombreChofer = form.elements.namedItem('nombreChofer') as HTMLInputElement;
-    const unidad = form.elements.namedItem('unidad') as HTMLInputElement;
-    const marca = form.elements.namedItem('marca') as HTMLInputElement;
+    const { numeroPlaca, numeroSerie, nombreChofer, unidad, marca } = formData;
 
-    if (!numeroPlaca.value || !numeroSerie.value || !nombreChofer.value || !unidad.value || !marca.value) {
+    if (!numeroPlaca || !numeroSerie || !nombreChofer || !unidad || !marca) {
       showAlert('Por favor, complete todos los campos.');
       return;
     }
 
-    if (!/^\d+$/.test(numeroPlaca.value)) {
+    if (!/^\d+$/.test(numeroPlaca)) {
       showAlert('Número de placa debe contener solo números.');
       return;
     }
 
     const newUnidad: UnidadProps = {
-      numeroPlaca: numeroPlaca.value,
-      numeroSerie: numeroSerie.value,
-      nombreChofer: nombreChofer.value,
-      unidad: unidad.value,
-      marca: marca.value,
+      numeroPlaca,
+      numeroSerie,
+      nombreChofer,
+      unidad,
+      marca,
       avatar: selectedAvatar,
     };
 
-    setUnidades([...unidades, newUnidad]);
+    if (editIndex !== null) {
+      const updatedUnidades = [...unidades];
+      updatedUnidades[editIndex] = newUnidad;
+      setUnidades(updatedUnidades);
+      setEditIndex(null);
+    } else {
+      setUnidades([...unidades, newUnidad]);
+    }
+
     setShowForm(false);
+    resetFormData();
   };
 
   const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const { value } = event.target;
+    const { name, value } = event.target;
+    setFormData((prevData) => ({ ...prevData, [name]: value }));
+
     let warningMessage = '';
 
     if (!value) {
       warningMessage = 'Este campo es obligatorio.';
-    } else if (!/^\d+$/.test(value) && event.target.name === 'numeroPlaca') {
+    } else if (!/^\d+$/.test(value) && name === 'numeroPlaca') {
       warningMessage = 'Número de placa debe contener solo números.';
     }
 
@@ -101,6 +130,53 @@ const UnidadFormulario: React.FC = () => {
     setShowAvatars(false);
   };
 
+  const handleEdit = (index: number) => {
+    const unidad = unidades[index];
+    setFormData({
+      numeroPlaca: unidad.numeroPlaca,
+      numeroSerie: unidad.numeroSerie,
+      nombreChofer: unidad.nombreChofer,
+      unidad: unidad.unidad,
+      marca: unidad.marca,
+    });
+    setSelectedAvatar(unidad.avatar);
+    setShowForm(true);
+    setEditIndex(index);
+  };
+
+  const handleDelete = (index: number) => {
+    Swal.fire({
+      title: '¿Estás seguro?',
+      text: 'No podrás revertir esto.',
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonColor: '#3085d6',
+      cancelButtonColor: '#d33',
+      confirmButtonText: 'Sí, bórralo.',
+    }).then((result) => {
+      if (result.isConfirmed) {
+        const updatedUnidades = [...unidades];
+        updatedUnidades.splice(index, 1);
+        setUnidades(updatedUnidades);
+        Swal.fire('Borrado', 'La unidad ha sido borrada.', 'success');
+      }
+    });
+  };
+
+  useEffect(() => {
+    if (editIndex !== null) {
+      const unidad = unidades[editIndex];
+      setFormData({
+        numeroPlaca: unidad.numeroPlaca,
+        numeroSerie: unidad.numeroSerie,
+        nombreChofer: unidad.nombreChofer,
+        unidad: unidad.unidad,
+        marca: unidad.marca,
+      });
+      setSelectedAvatar(unidad.avatar);
+    }
+  }, [editIndex]);
+
   return (
     <Container>
       <Header>
@@ -119,6 +195,14 @@ const UnidadFormulario: React.FC = () => {
               <h3>Unidad: {unidad.unidad}</h3>
               <h3>Marca: {unidad.marca}</h3>
             </CardText>
+            <CardActions>
+              <EditButton onClick={() => handleEdit(index)}>
+                <FaEdit />
+              </EditButton>
+              <DeleteButton onClick={() => handleDelete(index)}>
+                <FaTrash />
+              </DeleteButton>
+            </CardActions>
           </Card>
         ))}
       </UnidadesContainer>
@@ -150,6 +234,7 @@ const UnidadFormulario: React.FC = () => {
                       type="text"
                       placeholder="Número de placa"
                       name="numeroPlaca"
+                      value={formData.numeroPlaca}
                       onChange={handleInputChange}
                     />
                   </InputWrapper>
@@ -162,6 +247,7 @@ const UnidadFormulario: React.FC = () => {
                       type="text"
                       placeholder="Número de serie"
                       name="numeroSerie"
+                      value={formData.numeroSerie}
                       onChange={handleInputChange}
                     />
                   </InputWrapper>
@@ -174,6 +260,7 @@ const UnidadFormulario: React.FC = () => {
                       type="text"
                       placeholder="Nombre del chofer"
                       name="nombreChofer"
+                      value={formData.nombreChofer}
                       onChange={handleInputChange}
                     />
                   </InputWrapper>
@@ -186,6 +273,7 @@ const UnidadFormulario: React.FC = () => {
                       type="text"
                       placeholder="Unidad"
                       name="unidad"
+                      value={formData.unidad}
                       onChange={handleInputChange}
                     />
                   </InputWrapper>
@@ -198,13 +286,17 @@ const UnidadFormulario: React.FC = () => {
                       type="text"
                       placeholder="Marca"
                       name="marca"
+                      value={formData.marca}
                       onChange={handleInputChange}
                     />
                   </InputWrapper>
                   {warning && <Warning>{warning}</Warning>}
                 </InputGroup>
                 <ButtonContainer>
-                  <SubmitButton type="submit">Agregar</SubmitButton>
+                  <SubmitButton type="submit">Guardar</SubmitButton>
+                  <CancelButton type="button" onClick={closeForm}>
+                    Cancelar
+                  </CancelButton>
                 </ButtonContainer>
               </form>
             </FormWrapper>
@@ -216,135 +308,87 @@ const UnidadFormulario: React.FC = () => {
 };
 
 const Container = styled.div`
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  height: 100vh;
-  background-color: #f0f4f8;
-  position: relative;
-  padding-top: 50px;
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 20px;
 `;
 
 const Header = styled.div`
-  width: 100%;
   display: flex;
   justify-content: flex-end;
-  padding: 10px;
-  background-color: #ffffff;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-  position: fixed;
-  top: 0;
-  z-index: 1000;
 `;
 
 const AddButton = styled.button`
   background-color: #007bff;
-  color: #ffffff;
+  color: #fff;
   border: none;
-  border-radius: 50%;
-  width: 40px;
-  height: 40px;
+  padding: 10px 20px;
+  font-size: 16px;
   cursor: pointer;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  font-size: 20px;
-  transition: background-color 0.3s, transform 0.3s;
-
+  border-radius: 5px;
   &:hover {
     background-color: #0056b3;
-    transform: scale(1.1);
   }
 `;
 
-const CloseButton = styled.button`
-  position: absolute;
-  top: 10px;
-  right: 10px;
-  background-color: transparent;
-  border: none;
-  cursor: pointer;
-  color: #333;
-  font-size: 24px;
-`;
-
 const UnidadesContainer = styled.div`
-  position: relative;
-  margin-top: 20px;
   display: flex;
   flex-wrap: wrap;
-  justify-content: center;
+  justify-content: space-between;
 `;
 
 const Card = styled.div`
-  background-color: #ffffff;
-  padding: 15px;
-  border-radius: 8px;
-  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1);
-  width: 250px;
-  height: 200px;
-  margin: 10px;
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-  align-items: center;
+  background-color: #fff;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+  padding: 20px;
+  width: 30%;
+  margin: 10px 0;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+`;
+
+const Avatar = styled.img`
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  margin-right: 10px;
 `;
 
 const CardText = styled.div`
+  display: flex;
+  flex-direction: column;
   h3 {
-    font-size: 16px;
     margin: 5px 0;
   }
 `;
 
-const Avatar = styled.img`
-  width: 60px;
-  height: 60px;
-  border-radius: 50%;
-  object-fit: cover;
-  margin-bottom: 10px;
-`;
-
-const AvatarContainer = styled.div`
+const CardActions = styled.div`
   display: flex;
-  flex-direction: column;
-  align-items: center;
-  margin-bottom: 15px;
+  justify-content: space-between;
 `;
 
-const AvatarButton = styled.button`
-  background-color: #007bff;
-  color: #ffffff;
+const EditButton = styled.button`
+  background-color: #28a745;
+  color: #fff;
   border: none;
-  border-radius: 50%;
-  width: 30px;
-  height: 30px;
+  padding: 5px 10px;
   cursor: pointer;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  font-size: 16px;
-  transition: background-color 0.3s, transform 0.3s;
-
+  border-radius: 5px;
   &:hover {
-    background-color: #0056b3;
-    transform: scale(1.1);
+    background-color: #218838;
   }
 `;
 
-const AvatarsList = styled.div`
-  display: flex;
-  justify-content: center;
-  flex-wrap: wrap;
-  margin-bottom: 15px;
-`;
-
-const AvatarOption = styled.div`
-  margin: 5px;
+const DeleteButton = styled.button`
+  background-color: #dc3545;
+  color: #fff;
+  border: none;
+  padding: 5px 10px;
   cursor: pointer;
-
+  border-radius: 5px;
   &:hover {
-    transform: scale(1.1);
+    background-color: #c82333;
   }
 `;
 
@@ -352,23 +396,33 @@ const OverlayContainer = styled.div`
   position: fixed;
   top: 0;
   left: 0;
-  right: 0;
-  bottom: 0;
-  background: rgba(0, 0, 0, 0.5);
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
   display: flex;
-  justify-content: center;
   align-items: center;
-  z-index: 999;
+  justify-content: center;
 `;
 
 const FormContainer = styled.div`
-  background-color: #ffffff;
+  background-color: #fff;
+  border-radius: 10px;
   padding: 20px;
-  border-radius: 8px;
-  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1);
-  width: 90%;
-  max-width: 500px;
+  width: 500px;
+  max-width: 90%;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
   position: relative;
+`;
+
+const CloseButton = styled.button`
+  background-color: transparent;
+  border: none;
+  color: #000;
+  font-size: 20px;
+  cursor: pointer;
+  position: absolute;
+  top: 10px;
+  right: 10px;
 `;
 
 const FormWrapper = styled.div`
@@ -377,51 +431,96 @@ const FormWrapper = styled.div`
   align-items: center;
 `;
 
+const AvatarContainer = styled.div`
+  display: flex;
+  align-items: center;
+  margin-bottom: 20px;
+`;
+
+const AvatarButton = styled.button`
+  background-color: #007bff;
+  color: #fff;
+  border: none;
+  border-radius: 50%;
+  width: 30px;
+  height: 30px;
+  font-size: 20px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  &:hover {
+    background-color: #0056b3;
+  }
+`;
+
+const AvatarsList = styled.div`
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  margin-bottom: 20px;
+`;
+
+const AvatarOption = styled.div`
+  cursor: pointer;
+  margin: 5px;
+`;
+
 const InputGroup = styled.div`
   width: 100%;
-  margin-bottom: 10px;
+  margin-bottom: 20px;
 `;
 
 const InputWrapper = styled.div`
   display: flex;
   align-items: center;
-  position: relative;
+  border: 1px solid #ddd;
+  padding: 10px;
+  border-radius: 5px;
 `;
 
 const InputField = styled.input`
+  border: none;
+  outline: none;
   width: 100%;
-  padding: 10px;
-  padding-left: 30px;
-  border: 1px solid #ddd;
-  border-radius: 4px;
-  font-size: 14px;
+  margin-left: 10px;
 `;
 
 const Warning = styled.span`
-  color: red;
+  color: #dc3545;
   font-size: 12px;
+  margin-top: 5px;
 `;
 
 const ButtonContainer = styled.div`
-  width: 100%;
   display: flex;
-  justify-content: center;
-  margin-top: 10px;
+  justify-content: space-between;
+  width: 100%;
 `;
 
 const SubmitButton = styled.button`
-  background-color: #007bff;
-  color: #ffffff;
+  background-color: #28a745;
+  color: #fff;
   border: none;
-  border-radius: 4px;
   padding: 10px 20px;
+  font-size: 16px;
   cursor: pointer;
-  font-size: 14px;
-  transition: background-color 0.3s, transform 0.3s;
-
+  border-radius: 5px;
   &:hover {
-    background-color: #0056b3;
-    transform: scale(1.05);
+    background-color: #218838;
+  }
+`;
+
+const CancelButton = styled.button`
+  background-color: #dc3545;
+  color: #fff;
+  border: none;
+  padding: 10px 20px;
+  font-size: 16px;
+  cursor: pointer;
+  border-radius: 5px;
+  &:hover {
+    background-color: #c82333;
   }
 `;
 
