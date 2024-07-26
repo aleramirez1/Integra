@@ -23,7 +23,8 @@ const EmpleadoFormulario: React.FC = () => {
     confirmPassword: ''
   });
   const [passwordStrength, setPasswordStrength] = useState(0);
-  
+  const [editIndex, setEditIndex] = useState<number | null>(null);
+
   const usernameRef = useRef<HTMLInputElement>(null);
 
   const toggleForm = () => {
@@ -32,6 +33,7 @@ const EmpleadoFormulario: React.FC = () => {
 
   const closeForm = () => {
     setShowForm(false);
+    setEditIndex(null);
   };
 
   const handleAdd = (event: React.FormEvent<HTMLFormElement>) => {
@@ -73,7 +75,15 @@ const EmpleadoFormulario: React.FC = () => {
       info2: 'Empleado',
     };
 
-    setCards([...cards, newCard]);
+    if (editIndex !== null) {
+      const updatedCards = [...cards];
+      updatedCards[editIndex] = newCard;
+      setCards(updatedCards);
+      setEditIndex(null);
+    } else {
+      setCards([...cards, newCard]);
+    }
+    
     setShowForm(false);
   };
 
@@ -115,7 +125,7 @@ const EmpleadoFormulario: React.FC = () => {
       if (!regex.test(usernameRef.current.value)) {
         setWarnings({
           ...warnings,
-          username: 'El nombre de usuario debe contener al menos una letra mayuscula o un digito.'
+          username: 'El nombre de usuario debe contener al menos una letra mayúscula o un dígito.'
         });
       } else {
         setWarnings({
@@ -143,6 +153,29 @@ const EmpleadoFormulario: React.FC = () => {
     });
   };
 
+  const handleEdit = (index: number) => {
+    const card = cards[index];
+    const [firstName, lastName] = card.name.split(' ');
+    const [username, email, telNumber] = card.info1.match(/Username: (.+), Email: (.+), Tel: (\d+)/)!.slice(1);
+
+    setEditIndex(index);
+    setShowForm(true);
+    
+    setTimeout(() => {
+      const form = document.querySelector('form') as HTMLFormElement;
+      (form.elements.namedItem('firstName') as HTMLInputElement).value = firstName;
+      (form.elements.namedItem('lastName') as HTMLInputElement).value = lastName;
+      (form.elements.namedItem('username') as HTMLInputElement).value = username;
+      (form.elements.namedItem('email') as HTMLInputElement).value = email;
+      (form.elements.namedItem('telNumber') as HTMLInputElement).value = telNumber;
+    }, 0);
+  };
+
+  const handleDelete = (index: number) => {
+    const updatedCards = cards.filter((_, i) => i !== index);
+    setCards(updatedCards);
+  };
+
   return (
     <div style={styles.container}>
       <div style={styles.header}>
@@ -160,6 +193,14 @@ const EmpleadoFormulario: React.FC = () => {
               <h3>{card.name}</h3>
               <p>{card.info1}</p>
               <p>{card.info2}</p>
+              <div style={styles.cardActions}>
+                <button style={styles.editButton} onClick={() => handleEdit(index)}>
+                  <i className="fas fa-edit"></i>
+                </button>
+                <button style={styles.deleteButton} onClick={() => handleDelete(index)}>
+                  <i className="fas fa-trash"></i>
+                </button>
+              </div>
             </div>
           </div>
         ))}
@@ -201,23 +242,26 @@ const EmpleadoFormulario: React.FC = () => {
                 </div>
                 <div style={styles.inputWithIcon}>
                   <span style={styles.icon}><i className="fas fa-phone"></i></span>
-                  <input type="tel" placeholder="Tel. Number" style={styles.inputFieldFull} name="telNumber" onChange={handleInputChange} />
+                  <input type="tel" placeholder="Tel Number" style={styles.inputFieldFull} name="telNumber" onChange={handleInputChange} />
                   {warnings.telNumber && <small style={styles.warning}>{warnings.telNumber}</small>}
                 </div>
                 <div style={styles.inputWithIcon}>
                   <span style={styles.icon}><i className="fas fa-lock"></i></span>
                   <input type="password" placeholder="Password" style={styles.inputFieldFull} name="password" onChange={handleInputChange} />
                   {warnings.password && <small style={styles.warning}>{warnings.password}</small>}
-                  <div style={{ ...styles.passwordStrengthBar, backgroundColor: getPasswordStrengthColor(passwordStrength) }} />
+                </div>
+                <div style={styles.passwordStrengthContainer}>
+                  <div style={styles.passwordStrengthBar(passwordStrength >= 1)}></div>
+                  <div style={styles.passwordStrengthBar(passwordStrength >= 2)}></div>
+                  <div style={styles.passwordStrengthBar(passwordStrength >= 3)}></div>
+                  <div style={styles.passwordStrengthBar(passwordStrength >= 4)}></div>
                 </div>
                 <div style={styles.inputWithIcon}>
                   <span style={styles.icon}><i className="fas fa-lock"></i></span>
                   <input type="password" placeholder="Confirm Password" style={styles.inputFieldFull} name="confirmPassword" onChange={handleInputChange} />
                   {warnings.confirmPassword && <small style={styles.warning}>{warnings.confirmPassword}</small>}
                 </div>
-                <div style={styles.buttonContainer}>
-                  <button type="submit" style={styles.submitButton}>Agregar</button>
-                </div>
+                <button type="submit" style={styles.submitButton}>Save</button>
               </form>
             </div>
           </div>
@@ -227,155 +271,165 @@ const EmpleadoFormulario: React.FC = () => {
   );
 };
 
-const getPasswordStrengthColor = (strength: number) => {
-  switch (strength) {
-    case 1:
-      return 'red';
-    case 2:
-      return 'orange';
-    case 3:
-      return 'yellow';
-    case 4:
-      return 'green';
-    default:
-      return 'grey';
-  }
-};
-
 const styles = {
   container: {
     display: 'flex',
     flexDirection: 'column' as 'column',
-    alignItems: 'center' as 'center',
-    height: '100vh',
-    backgroundColor: '#e0e7d9',
-    position: 'relative' as 'relative',
+    alignItems: 'center',
   },
   header: {
-    width: '100%',
     display: 'flex',
-    justifyContent: 'flex-end' as 'flex-end',
+    justifyContent: 'center',
+    width: '100%',
     padding: '10px',
-    backgroundColor: '#fff',
-    boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)',
-    position: 'fixed' as 'fixed',
-    top: 0,
-    zIndex: 1000,
+    background: '#f7f7f7',
+    borderBottom: '1px solid #ddd',
   },
   addButton: {
-    backgroundColor: '#4CAF50',
+    fontSize: '20px',
+    padding: '10px',
+    borderRadius: '50%',
+    background: '#007bff',
     color: '#fff',
     border: 'none',
-    borderRadius: '50%',
-    width: '40px',
-    height: '40px',
     cursor: 'pointer',
-    display: 'flex',
-    justifyContent: 'center' as 'center',
-    alignItems: 'center' as 'center',
-  },
-  closeButton: {
-    position: 'absolute' as 'absolute',
-    top: '10px',
-    right: '10px',
-    backgroundColor: 'transparent',
-    border: 'none',
-    cursor: 'pointer',
-    color: '#333',
-    fontSize: '20px',
   },
   cardsContainer: {
-    position: 'relative' as 'relative',
-    marginTop: '100px',
     display: 'flex',
     flexWrap: 'wrap' as 'wrap',
-    justifyContent: 'flex-end' as 'flex-end',
+    justifyContent: 'center',
+    width: '100%',
+    padding: '10px',
   },
   card: {
-    backgroundColor: '#fff',
+    display: 'flex',
+    flexDirection: 'column' as 'column',
+    alignItems: 'center',
+    width: '200px',
     padding: '10px',
+    margin: '10px',
+    background: '#fff',
     borderRadius: '10px',
-    boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)',
-    width: '180px',
-    height: '200px',
+    boxShadow: '0 4px 8px rgba(0,0,0,0.1)',
     textAlign: 'center' as 'center',
-    marginBottom: '10px',
-    marginRight: '10px',
   },
   avatarContainer: {
-    marginBottom: '20px',
-  },
-  avatar: {
     width: '80px',
     height: '80px',
     borderRadius: '50%',
-    backgroundColor: '#ccc',
-    margin: '0 auto 10px auto',
+    overflow: 'hidden',
+    marginBottom: '10px',
+  },
+  avatar: {
+    width: '100%',
+    height: 'auto',
   },
   cardText: {
-    textAlign: 'center' as 'center',
+    display: 'flex',
+    flexDirection: 'column' as 'column',
+    alignItems: 'center',
+  },
+  cardActions: {
+    display: 'flex',
+    justifyContent: 'space-between',
+    width: '100%',
+    marginTop: '10px',
+  },
+  editButton: {
+    fontSize: '16px',
+    padding: '5px',
+    background: '#ffc107',
+    color: '#fff',
+    border: 'none',
+    borderRadius: '5px',
+    cursor: 'pointer',
+  },
+  deleteButton: {
+    fontSize: '16px',
+    padding: '5px',
+    background: '#dc3545',
+    color: '#fff',
+    border: 'none',
+    borderRadius: '5px',
+    cursor: 'pointer',
   },
   overlayContainer: {
     position: 'fixed' as 'fixed',
     top: 0,
     left: 0,
-    width: '100%',
-    height: '100%',
+    right: 0,
+    bottom: 0,
     backgroundColor: 'rgba(0, 0, 0, 0.5)',
-    zIndex: 1000,
     display: 'flex',
-    justifyContent: 'center' as 'center',
-    alignItems: 'center' as 'center',
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   formContainer: {
-    backgroundColor: '#fff',
-    padding: '20px',
-    borderRadius: '10px',
-    boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)',
-    width: '300px',
-    textAlign: 'center' as 'center',
     position: 'relative' as 'relative',
+    width: '400px',
+    padding: '20px',
+    background: '#fff',
+    borderRadius: '10px',
+  },
+  closeButton: {
+    position: 'absolute' as 'absolute',
+    top: '10px',
+    right: '10px',
+    fontSize: '20px',
+    background: 'none',
+    border: 'none',
+    cursor: 'pointer',
   },
   formWrapper: {
-    width: '100%',
+    display: 'flex',
+    flexDirection: 'column' as 'column',
+    alignItems: 'center',
   },
   inputGroup: {
     display: 'flex',
-    justifyContent: 'space-between' as 'space-between',
+    justifyContent: 'space-between',
+    width: '100%',
     marginBottom: '10px',
   },
   inputField: {
     width: '48%',
     padding: '10px',
-    border: '1px solid #ccc',
+    border: '1px solid #ddd',
     borderRadius: '5px',
-    marginBottom: '10px',
   },
   inputWithIcon: {
-    display: 'flex',
-    alignItems: 'center' as 'center',
+    position: 'relative' as 'relative',
+    width: '100%',
     marginBottom: '10px',
-  },
-  icon: {
-    padding: '10px',
-    backgroundColor: '#ccc',
-    border: '1px solid #ccc',
-    borderRadius: '5px 0 0 5px',
-    color: 'white',
   },
   inputFieldFull: {
     width: '100%',
-    padding: '10px',
-    border: '1px solid #ccc',
-    borderRadius: '0 5px 5px 0',
+    padding: '10px 10px 10px 30px',
+    border: '1px solid #ddd',
+    borderRadius: '5px',
   },
-  buttonContainer: {
-    textAlign: 'right' as 'right',
-    marginTop: '10px',
+  icon: {
+    position: 'absolute' as 'absolute',
+    top: '50%',
+    left: '10px',
+    transform: 'translateY(-50%)',
+    color: '#aaa',
   },
+  passwordStrengthContainer: {
+    display: 'flex',
+    justifyContent: 'space-between',
+    width: '100%',
+    marginBottom: '10px',
+  },
+  passwordStrengthBar: (isActive: boolean) => ({
+    width: '23%',
+    height: '5px',
+    backgroundColor: isActive ? '#4caf50' : '#ddd',
+  }),
   submitButton: {
-    padding: '10px 20px',
-    backgroundColor: '#4CAF50',
+    width: '100%',
+    padding: '10px',
+    background: '#007bff',
     color: '#fff',
     border: 'none',
     borderRadius: '5px',
@@ -384,13 +438,8 @@ const styles = {
   warning: {
     color: 'red',
     fontSize: '12px',
-  },
-  passwordStrengthBar: {
-    height: '5px',
-    borderRadius: '5px',
     marginTop: '5px',
-    width: '100%',
-  }
+  },
 };
 
 export default EmpleadoFormulario;
