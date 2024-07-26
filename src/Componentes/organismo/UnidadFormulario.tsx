@@ -90,7 +90,7 @@ const UnidadFormulario: React.FC = () => {
       setUnidades(updatedUnidades);
       setEditIndex(null);
     } else {
-      setUnidades([...unidades, newUnidad]);
+      setUnidades([newUnidad, ...unidades]);
     }
 
     setShowForm(false);
@@ -250,7 +250,6 @@ const UnidadFormulario: React.FC = () => {
                       onChange={handleInputChange}
                     />
                   </InputWrapper>
-                  {warning && <Warning>{warning}</Warning>}
                 </InputGroup>
                 <InputGroup>
                   <InputWrapper>
@@ -263,7 +262,6 @@ const UnidadFormulario: React.FC = () => {
                       onChange={handleInputChange}
                     />
                   </InputWrapper>
-                  {warning && <Warning>{warning}</Warning>}
                 </InputGroup>
                 <InputGroup>
                   <InputWrapper>
@@ -276,7 +274,6 @@ const UnidadFormulario: React.FC = () => {
                       onChange={handleInputChange}
                     />
                   </InputWrapper>
-                  {warning && <Warning>{warning}</Warning>}
                 </InputGroup>
                 <InputGroup>
                   <InputWrapper>
@@ -289,16 +286,10 @@ const UnidadFormulario: React.FC = () => {
                       onChange={handleInputChange}
                     />
                   </InputWrapper>
-                  {warning && <Warning>{warning}</Warning>}
                 </InputGroup>
-                <ButtonContainer>
-                  <SubmitButton type="submit">
-                    {editIndex !== null ? 'Actualizar' : 'Agregar'}
-                  </SubmitButton>
-                  <CancelButton type="button" onClick={closeForm}>
-                    Cancelar
-                  </CancelButton>
-                </ButtonContainer>
+                <SubmitButton type="submit">
+                  {editIndex !== null ? 'Actualizar Unidad' : 'Agregar Unidad'}
+                </SubmitButton>
               </form>
             </FormWrapper>
           </FormContainer>
@@ -309,7 +300,6 @@ const UnidadFormulario: React.FC = () => {
 };
 
 const Container = styled.div`
-  width: 100%;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -319,138 +309,110 @@ const Header = styled.div`
   width: 100%;
   display: flex;
   justify-content: flex-end;
-  padding: 1rem;
+  padding: 10px;
 `;
 
 const AddButton = styled.button`
   background-color: #4caf50;
   color: white;
   border: none;
-  padding: 10px 20px;
-  font-size: 16px;
+  padding: 10px;
   cursor: pointer;
-  border-radius: 4px;
-
-  &:hover {
-    background-color: #45a049;
-  }
-
-  .fas {
-    margin-right: 5px;
-  }
+  border-radius: 50%;
+  font-size: 24px;
 `;
 
 const UnidadesContainer = styled.div`
   display: flex;
-  flex-wrap: wrap;
-  justify-content: center;
-  gap: 1rem;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+  max-width: 600px;
 `;
 
 const Card = styled.div`
-  background-color: white;
-  border-radius: 10px;
-  padding: 1rem;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  background-color: #f9f9f9;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  padding: 10px;
+  margin: 10px;
+  width: 100%;
   display: flex;
   flex-direction: column;
   align-items: center;
-  text-align: center;
-  width: 250px;
-  transition: transform 0.2s;
-
-  &:hover {
-    transform: scale(1.05);
-  }
 `;
 
 const Avatar = styled.img`
-  width: 100px;
-  height: 100px;
+  width: 50px;
+  height: 50px;
   border-radius: 50%;
-  margin-bottom: 1rem;
+  margin-bottom: 10px;
 `;
 
 const CardText = styled.div`
-  h3 {
-    margin: 0.5rem 0;
-  }
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 `;
 
 const CardActions = styled.div`
   display: flex;
-  justify-content: space-between;
-  width: 100%;
-  margin-top: 1rem;
+  gap: 10px;
 `;
 
 const EditButton = styled.button`
-  background-color: #ffc107;
+  background-color: #2196f3;
   color: white;
   border: none;
-  padding: 10px;
-  border-radius: 50%;
+  padding: 5px;
   cursor: pointer;
-
-  &:hover {
-    background-color: #e0a800;
-  }
-
-  svg {
-    font-size: 16px;
-  }
+  border-radius: 4px;
+  font-size: 18px;
 `;
 
 const DeleteButton = styled.button`
   background-color: #f44336;
   color: white;
   border: none;
-  padding: 10px;
-  border-radius: 50%;
+  padding: 5px;
   cursor: pointer;
-
-  &:hover {
-    background-color: #d32f2f;
-  }
-
-  svg {
-    font-size: 16px;
-  }
+  border-radius: 4px;
+  font-size: 18px;
 `;
 
 const OverlayContainer = styled.div`
   position: fixed;
   top: 0;
   left: 0;
-  width: 100%;
-  height: 100%;
+  width: 100vw;
+  height: 100vh;
+  background-color: rgba(0, 0, 0, 0.5);
   display: flex;
   justify-content: center;
   align-items: center;
-  background: rgba(0, 0, 0, 0.6);
-  z-index: 1000;
 `;
 
 const FormContainer = styled.div`
   background-color: white;
-  padding: 2rem;
-  border-radius: 10px;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-  position: relative;
+  padding: 20px;
+  border-radius: 8px;
+  width: 90%;
+  max-width: 400px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 `;
 
 const CloseButton = styled.button`
+  align-self: flex-end;
   background: none;
   border: none;
-  color: #000;
-  font-size: 1.5rem;
-  position: absolute;
-  top: 1rem;
-  right: 1rem;
+  font-size: 24px;
   cursor: pointer;
 `;
 
 const FormWrapper = styled.div`
+  width: 100%;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -459,56 +421,37 @@ const FormWrapper = styled.div`
 const AvatarContainer = styled.div`
   display: flex;
   align-items: center;
-  margin-bottom: 1rem;
+  justify-content: center;
+  position: relative;
 `;
 
 const AvatarButton = styled.button`
-  background-color: #4caf50;
+  position: absolute;
+  bottom: 0;
+  right: 0;
+  background-color: #2196f3;
   color: white;
   border: none;
   border-radius: 50%;
-  width: 40px;
-  height: 40px;
-  font-size: 24px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  width: 24px;
+  height: 24px;
   cursor: pointer;
-  margin-left: 1rem;
-
-  &:hover {
-    background-color: #45a049;
-  }
+  font-size: 18px;
 `;
 
 const AvatarsList = styled.div`
   display: flex;
-  justify-content: center;
-  flex-wrap: wrap;
-  margin-bottom: 1rem;
+  gap: 10px;
+  margin-top: 10px;
 `;
 
 const AvatarOption = styled.div`
-  margin: 0.5rem;
   cursor: pointer;
-
-  img {
-    width: 60px;
-    height: 60px;
-    border-radius: 50%;
-    border: 2px solid transparent;
-    transition: border-color 0.2s;
-
-    &:hover {
-      border-color: #4caf50;
-    }
-  }
 `;
 
 const InputGroup = styled.div`
   width: 100%;
-  margin-bottom: 1rem;
-  position: relative;
+  margin-bottom: 10px;
 `;
 
 const InputWrapper = styled.div`
@@ -517,61 +460,27 @@ const InputWrapper = styled.div`
 `;
 
 const InputField = styled.input`
-  width: 100%;
-  padding: 0.5rem 0.75rem;
-  border: 1px solid #ccc;
-  border-radius: 4px;
-  font-size: 1rem;
-  margin-left: 0.5rem;
   flex: 1;
-
-  &:focus {
-    outline: none;
-    border-color: #4caf50;
-  }
+  padding: 10px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  margin-left: 10px;
 `;
 
-const Warning = styled.span`
+const Warning = styled.div`
   color: red;
-  font-size: 0.8rem;
-  position: absolute;
-  bottom: -20px;
-  left: 0;
-`;
-
-const ButtonContainer = styled.div`
-  display: flex;
-  justify-content: center;
-  margin-top: 1rem;
+  font-size: 12px;
+  margin-top: 5px;
 `;
 
 const SubmitButton = styled.button`
   background-color: #4caf50;
   color: white;
   border: none;
-  padding: 10px 20px;
-  font-size: 16px;
+  padding: 10px;
   cursor: pointer;
   border-radius: 4px;
-  margin-right: 0.5rem;
-
-  &:hover {
-    background-color: #45a049;
-  }
-`;
-
-const CancelButton = styled.button`
-  background-color: #f44336;
-  color: white;
-  border: none;
-  padding: 10px 20px;
   font-size: 16px;
-  cursor: pointer;
-  border-radius: 4px;
-
-  &:hover {
-    background-color: #d32f2f;
-  }
 `;
 
 export default UnidadFormulario;
