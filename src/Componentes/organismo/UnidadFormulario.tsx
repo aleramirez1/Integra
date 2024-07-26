@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import styled from 'styled-components';
 import { FaCar, FaHashtag, FaUser, FaTruck, FaTrademark, FaEdit, FaTrash } from 'react-icons/fa';
 import Swal from 'sweetalert2';
@@ -20,14 +20,6 @@ const UnidadFormulario: React.FC = () => {
   const [selectedAvatar, setSelectedAvatar] = useState('/b11-10.jpg');
   const [editIndex, setEditIndex] = useState<number | null>(null);
 
-  const [formData, setFormData] = useState({
-    numeroPlaca: '',
-    numeroSerie: '',
-    nombreChofer: '',
-    unidad: '',
-    marca: '',
-  });
-
   const avatars = [
     '/1-removebg-preview.png',
     '/u-removebg-preview.png',
@@ -37,50 +29,43 @@ const UnidadFormulario: React.FC = () => {
 
   const toggleForm = () => {
     setShowForm(!showForm);
-    if (!showForm) {
+    if (showForm) {
       setUnidades([]);
-      resetFormData();
     }
   };
 
   const closeForm = () => {
     setShowForm(false);
-    resetFormData();
+    setUnidades([]);
     setEditIndex(null);
-  };
-
-  const resetFormData = () => {
-    setFormData({
-      numeroPlaca: '',
-      numeroSerie: '',
-      nombreChofer: '',
-      unidad: '',
-      marca: '',
-    });
-    setSelectedAvatar('/b11-10.jpg');
   };
 
   const handleAdd = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
 
-    const { numeroPlaca, numeroSerie, nombreChofer, unidad, marca } = formData;
+    const form = event.target as HTMLFormElement;
+    const numeroPlaca = form.elements.namedItem('numeroPlaca') as HTMLInputElement;
+    const numeroSerie = form.elements.namedItem('numeroSerie') as HTMLInputElement;
+    const nombreChofer = form.elements.namedItem('nombreChofer') as HTMLInputElement;
+    const unidad = form.elements.namedItem('unidad') as HTMLInputElement;
+    const marca = form.elements.namedItem('marca') as HTMLInputElement;
 
-    if (!numeroPlaca || !numeroSerie || !nombreChofer || !unidad || !marca) {
+    if (!numeroPlaca.value || !numeroSerie.value || !nombreChofer.value || !unidad.value || !marca.value) {
       showAlert('Por favor, complete todos los campos.');
       return;
     }
 
-    if (!/^\d+$/.test(numeroPlaca)) {
+    if (!/^\d+$/.test(numeroPlaca.value)) {
       showAlert('Número de placa debe contener solo números.');
       return;
     }
 
     const newUnidad: UnidadProps = {
-      numeroPlaca,
-      numeroSerie,
-      nombreChofer,
-      unidad,
-      marca,
+      numeroPlaca: numeroPlaca.value,
+      numeroSerie: numeroSerie.value,
+      nombreChofer: nombreChofer.value,
+      unidad: unidad.value,
+      marca: marca.value,
       avatar: selectedAvatar,
     };
 
@@ -90,23 +75,20 @@ const UnidadFormulario: React.FC = () => {
       setUnidades(updatedUnidades);
       setEditIndex(null);
     } else {
-      setUnidades([newUnidad, ...unidades]);
+      setUnidades([...unidades, newUnidad]);
     }
 
     setShowForm(false);
-    resetFormData();
   };
 
   const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = event.target;
-    setFormData((prevData) => ({ ...prevData, [name]: value }));
-
+    const { value } = event.target;
     let warningMessage = '';
 
     if (!value) {
       warningMessage = 'Este campo es obligatorio.';
-    } else if (!/^\d+$/.test(value) && name === 'numeroPlaca') {
-      warningMessage = 'Numero de placa debe contener solo números.';
+    } else if (!/^\d+$/.test(value) && event.target.name === 'numeroPlaca') {
+      warningMessage = 'Número de placa debe contener solo números.';
     }
 
     setWarning(warningMessage);
@@ -131,13 +113,6 @@ const UnidadFormulario: React.FC = () => {
 
   const handleEdit = (index: number) => {
     const unidad = unidades[index];
-    setFormData({
-      numeroPlaca: unidad.numeroPlaca,
-      numeroSerie: unidad.numeroSerie,
-      nombreChofer: unidad.nombreChofer,
-      unidad: unidad.unidad,
-      marca: unidad.marca,
-    });
     setSelectedAvatar(unidad.avatar);
     setShowForm(true);
     setEditIndex(index);
@@ -145,8 +120,8 @@ const UnidadFormulario: React.FC = () => {
 
   const handleDelete = (index: number) => {
     Swal.fire({
-      title: '¿Estas seguro?',
-      text: 'No podras revertir esto.',
+      title: '¿Estás seguro?',
+      text: 'No podrás revertir esto.',
       icon: 'warning',
       showCancelButton: true,
       confirmButtonColor: '#3085d6',
@@ -161,20 +136,6 @@ const UnidadFormulario: React.FC = () => {
       }
     });
   };
-
-  useEffect(() => {
-    if (editIndex !== null) {
-      const unidad = unidades[editIndex];
-      setFormData({
-        numeroPlaca: unidad.numeroPlaca,
-        numeroSerie: unidad.numeroSerie,
-        nombreChofer: unidad.nombreChofer,
-        unidad: unidad.unidad,
-        marca: unidad.marca,
-      });
-      setSelectedAvatar(unidad.avatar);
-    }
-  }, [editIndex]);
 
   return (
     <Container>
@@ -233,7 +194,6 @@ const UnidadFormulario: React.FC = () => {
                       type="text"
                       placeholder="Número de placa"
                       name="numeroPlaca"
-                      value={formData.numeroPlaca}
                       onChange={handleInputChange}
                     />
                   </InputWrapper>
@@ -246,10 +206,10 @@ const UnidadFormulario: React.FC = () => {
                       type="text"
                       placeholder="Número de serie"
                       name="numeroSerie"
-                      value={formData.numeroSerie}
                       onChange={handleInputChange}
                     />
                   </InputWrapper>
+                  {warning && <Warning>{warning}</Warning>}
                 </InputGroup>
                 <InputGroup>
                   <InputWrapper>
@@ -258,22 +218,22 @@ const UnidadFormulario: React.FC = () => {
                       type="text"
                       placeholder="Nombre del chofer"
                       name="nombreChofer"
-                      value={formData.nombreChofer}
                       onChange={handleInputChange}
                     />
                   </InputWrapper>
+                  {warning && <Warning>{warning}</Warning>}
                 </InputGroup>
                 <InputGroup>
                   <InputWrapper>
                     <FaTruck className="icon" />
                     <InputField
                       type="text"
-                      placeholder="unidad"
+                      placeholder="Unidad"
                       name="unidad"
-                      value={formData.unidad}
                       onChange={handleInputChange}
                     />
                   </InputWrapper>
+                  {warning && <Warning>{warning}</Warning>}
                 </InputGroup>
                 <InputGroup>
                   <InputWrapper>
@@ -282,14 +242,14 @@ const UnidadFormulario: React.FC = () => {
                       type="text"
                       placeholder="Marca"
                       name="marca"
-                      value={formData.marca}
                       onChange={handleInputChange}
                     />
                   </InputWrapper>
+                  {warning && <Warning>{warning}</Warning>}
                 </InputGroup>
-                <SubmitButton type="submit">
-                  {editIndex !== null ? 'Actualizar Unidad' : 'Agregar Unidad'}
-                </SubmitButton>
+                <ButtonContainer>
+                  <SubmitButton type="submit">Agregar</SubmitButton>
+                </ButtonContainer>
               </form>
             </FormWrapper>
           </FormContainer>
@@ -303,6 +263,10 @@ const Container = styled.div`
   display: flex;
   flex-direction: column;
   align-items: center;
+  height: 100vh;
+  background-color: #f0f4f8;
+  position: relative;
+  padding-top: 50px;
 `;
 
 const Header = styled.div`
@@ -310,82 +274,93 @@ const Header = styled.div`
   display: flex;
   justify-content: flex-end;
   padding: 10px;
+  background-color: #ffffff;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  position: fixed;
+  top: 0;
+  z-index: 1000;
 `;
 
 const AddButton = styled.button`
-  background-color: #4caf50;
-  color: white;
+  background-color: #007bff;
+  color: #ffffff;
   border: none;
-  padding: 10px;
-  cursor: pointer;
   border-radius: 50%;
+  width: 50px;
+  height: 50px;
   font-size: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
 `;
 
 const UnidadesContainer = styled.div`
   display: flex;
-  flex-direction: column;
-  align-items: center;
-  width: 100%;
-  max-width: 600px;
+  flex-wrap: wrap;
+  justify-content: center;
+  margin-top: 70px;
 `;
 
 const Card = styled.div`
-  background-color: #f9f9f9;
-  border: 1px solid #ddd;
+  background-color: #ffffff;
   border-radius: 8px;
-  padding: 10px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  width: 300px;
   margin: 10px;
-  width: 90%;
+  padding: 20px;
   display: flex;
   flex-direction: column;
   align-items: center;
+  position: relative;
 `;
 
 const Avatar = styled.img`
-  width: 50px;
-  height: 50px;
+  width: 80px;
+  height: 80px;
   border-radius: 50%;
-  margin-bottom: 10px;
+  object-fit: cover;
 `;
 
 const CardText = styled.div`
-  display: flex;
-  flex-direction: column;
-  align-items: center;
+  text-align: center;
+  margin-top: 10px;
+
+  h3 {
+    margin: 5px 0;
+  }
 `;
 
 const CardActions = styled.div`
+  position: absolute;
+  top: 10px;
+  right: 10px;
   display: flex;
   gap: 10px;
 `;
 
 const EditButton = styled.button`
-  background-color: #2196f3;
-  color: white;
+  background-color: transparent;
   border: none;
-  padding: 5px;
-  cursor: pointer;
-  border-radius: 4px;
+  color: #ffc107;
   font-size: 18px;
+  cursor: pointer;
 `;
 
 const DeleteButton = styled.button`
-  background-color: #f44336;
-  color: white;
+  background-color: transparent;
   border: none;
-  padding: 5px;
-  cursor: pointer;
-  border-radius: 4px;
+  color: #dc3545;
   font-size: 18px;
+  cursor: pointer;
 `;
 
 const OverlayContainer = styled.div`
   position: fixed;
   top: 0;
   left: 0;
-  width: 100vw;
-  height: 100vh;
+  width: 100%;
+  height: 100%;
   background-color: rgba(0, 0, 0, 0.5);
   display: flex;
   justify-content: center;
@@ -393,50 +368,98 @@ const OverlayContainer = styled.div`
 `;
 
 const FormContainer = styled.div`
-  background-color: white;
-  padding: 20px;
+  background-color: #ffffff;
   border-radius: 8px;
-  width: 90%;
-  max-width: 400px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
+  padding: 20px;
+  width: 400px;
+  position: relative;
 `;
 
 const CloseButton = styled.button`
-  align-self: flex-end;
-  background: none;
+  background-color: transparent;
   border: none;
   font-size: 24px;
+  position: absolute;
+  top: 10px;
+  right: 10px;
   cursor: pointer;
 `;
 
 const FormWrapper = styled.div`
-  width: 100%;
   display: flex;
   flex-direction: column;
   align-items: center;
+`;
+
+const InputGroup = styled.div`
+  margin-bottom: 15px;
+  width: 100%;
+`;
+
+const InputWrapper = styled.div`
+  display: flex;
+  align-items: center;
+  position: relative;
+
+  .icon {
+    position: absolute;
+    left: 10px;
+    font-size: 18px;
+    color: #6c757d;
+  }
+`;
+
+const InputField = styled.input`
+  width: 100%;
+  padding: 10px 10px 10px 40px;
+  border: 1px solid #ced4da;
+  border-radius: 4px;
+  font-size: 16px;
+`;
+
+const Warning = styled.p`
+  color: #dc3545;
+  font-size: 14px;
+  margin-top: 5px;
+`;
+
+const ButtonContainer = styled.div`
+  display: flex;
+  justify-content: center;
+  width: 100%;
+`;
+
+const SubmitButton = styled.button`
+  background-color: #28a745;
+  color: #ffffff;
+  border: none;
+  border-radius: 4px;
+  padding: 10px 20px;
+  font-size: 16px;
+  cursor: pointer;
 `;
 
 const AvatarContainer = styled.div`
   display: flex;
   align-items: center;
-  justify-content: center;
   position: relative;
 `;
 
 const AvatarButton = styled.button`
-  position: absolute;
-  bottom: 0;
-  right: 0;
-  background-color: #2196f3;
-  color: white;
+  background-color: #007bff;
+  color: #ffffff;
   border: none;
   border-radius: 50%;
-  width: 24px;
-  height: 24px;
-  cursor: pointer;
+  width: 30px;
+  height: 30px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   font-size: 18px;
+  position: absolute;
+  right: -10px;
+  top: -10px;
+  cursor: pointer;
 `;
 
 const AvatarsList = styled.div`
@@ -447,40 +470,6 @@ const AvatarsList = styled.div`
 
 const AvatarOption = styled.div`
   cursor: pointer;
-`;
-
-const InputGroup = styled.div`
-  width: 100%;
-  margin-bottom: 10px;
-`;
-
-const InputWrapper = styled.div`
-  display: flex;
-  align-items: center;
-`;
-
-const InputField = styled.input`
-  flex: 1;
-  padding: 10px;
-  border: 1px solid #ddd;
-  border-radius: 4px;
-  margin-left: 10px;
-`;
-
-const Warning = styled.div`
-  color: red;
-  font-size: 12px;
-  margin-top: 5px;
-`;
-
-const SubmitButton = styled.button`
-  background-color: #4caf50;
-  color: white;
-  border: none;
-  padding: 10px;
-  cursor: pointer;
-  border-radius: 4px;
-  font-size: 16px;
 `;
 
 export default UnidadFormulario;
