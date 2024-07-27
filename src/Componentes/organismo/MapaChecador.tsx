@@ -1,19 +1,12 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useRef } from 'react';
 import Swal from 'sweetalert2';
+import { useMapContext } from '../../context/MapContext';
 
 const GOOGLE_MAPS_API_KEY = import.meta.env.VITE_GOOGLE_MAPS_API_KEY;
 
-interface DeviceMarker {
-  id: string;
-  marker: google.maps.Marker;
-}
-
 const MapaChecador: React.FC = () => {
   const mapRef = useRef<HTMLDivElement>(null);
-  const [map, setMap] = useState<google.maps.Map | null>(null);
-  const [deviceMarkers, setDeviceMarkers] = useState<DeviceMarker[]>([]);
-  const [buttonColor, setButtonColor] = useState('red');
-  const [locationAccessed, setLocationAccessed] = useState(false);
+  const { map, setMap, deviceMarkers, setDeviceMarkers, buttonColor, setButtonColor, locationAccessed, setLocationAccessed } = useMapContext();
 
   useEffect(() => {
     const loadGoogleMapsScript = () => {
@@ -65,7 +58,7 @@ const MapaChecador: React.FC = () => {
     };
 
     loadGoogleMapsScript();
-  }, []);
+  }, [setMap]);
 
   const handleActivateLocation = () => {
     if (locationAccessed) {
