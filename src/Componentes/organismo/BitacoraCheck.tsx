@@ -425,3 +425,4 @@ const BitacoraCheck: React.FC = () => {
 };
 
 export default BitacoraCheck;
+
