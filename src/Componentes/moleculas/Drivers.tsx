@@ -1,24 +1,9 @@
-import React from 'react';
-import { useMapContext } from '../../context/MapContext';
+import React from 'react'
 
-const Drivers: React.FC = () => {
-
-  const { map, deviceMarkers, buttonColor, locationAccessed } = useMapContext();
-
+function Drivers() {
   return (
-    <div style={{ textAlign: 'center', fontFamily: 'Arial, sans-serif' }}>
-      <h1>Driver Dashboard</h1>
-      <p>Welcome, Driver!</p>
+    <h1>Soy el drir</h1>
+  )
+}
 
-      <div style={{ marginTop: '20px' }}>
-        <h2>Map Status</h2>
-        <p><strong>Map Initialized:</strong> {map ? 'Yes' : 'No'}</p>
-        <p><strong>Number of Device Markers:</strong> {deviceMarkers.length}</p>
-        <p><strong>Button Color:</strong> {buttonColor}</p>
-        <p><strong>Location Accessed:</strong> {locationAccessed ? 'Yes' : 'No'}</p>
-      </div>
-    </div>
-  );
-};
-
-export default Drivers;
+export default Drivers
