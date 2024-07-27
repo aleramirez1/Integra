@@ -8,13 +8,12 @@ import Driver from './Componentes/moleculas/Drivers';
 import EmpleadoFormulario from './Componentes/organismo/EmpleadoFormulario';
 import UnidadFormulario from './Componentes/organismo/UnidadFormulario';
 import HorarioFormulario from './Componentes/organismo/HorarioFormulario';
-import ProtectedRoute from './Componentes/ProtectedRoute';
 import BitacoraCheck from './Componentes/organismo/BitacoraCheck';
 import MenuCheck from './Pages/MenuCheck';
 import MapaChecador from './Componentes/organismo/MapaChecador';
 
 const App: React.FC = () => {
-  const isAuthenticated = true; 
+  const isAuthenticated = true; // Aquí deberías conectar con el estado de autenticación real
 
   return (
     <Router>
@@ -23,39 +22,39 @@ const App: React.FC = () => {
         <Route path="/login" element={<Login />} />
         <Route 
           path="/admin" 
-          element={<ProtectedRoute element={<Admin />} isAuthenticated={isAuthenticated} />} 
+          element={isAuthenticated ? <Admin /> : <Login />} 
         />
         <Route 
           path="/checker" 
-          element={<ProtectedRoute element={<Checker />} isAuthenticated={isAuthenticated} />} 
+          element={isAuthenticated ? <Checker /> : <Login />} 
         />
         <Route 
           path="/driver" 
-          element={<ProtectedRoute element={<Driver />} isAuthenticated={isAuthenticated} />} 
+          element={isAuthenticated ? <Driver /> : <Login />} 
         />
         <Route 
           path="/empleados" 
-          element={<ProtectedRoute element={<EmpleadoFormulario />} isAuthenticated={isAuthenticated} />} 
+          element={isAuthenticated ? <EmpleadoFormulario /> : <Login />} 
         />
         <Route 
           path="/unidad" 
-          element={<ProtectedRoute element={<UnidadFormulario />} isAuthenticated={isAuthenticated} />} 
+          element={isAuthenticated ? <UnidadFormulario /> : <Login />} 
         />
         <Route 
           path="/bita" 
-          element={<ProtectedRoute element={<BitacoraCheck />} isAuthenticated={isAuthenticated} />} 
+          element={isAuthenticated ? <BitacoraCheck /> : <Login />} 
         />
         <Route 
           path="/menucheck" 
-          element={<ProtectedRoute element={<MenuCheck />} isAuthenticated={isAuthenticated} />} 
+          element={isAuthenticated ? <MenuCheck /> : <Login />} 
         />
         <Route 
           path="/mapa" 
-          element={<ProtectedRoute element={<MapaChecador />} isAuthenticated={isAuthenticated} />} 
+          element={isAuthenticated ? <MapaChecador /> : <Login />} 
         />
         <Route 
           path="/horario" 
-          element={<ProtectedRoute element={<HorarioFormulario />} isAuthenticated={isAuthenticated} />} 
+          element={isAuthenticated ? <HorarioFormulario /> : <Login />} 
         />
       </Routes>
     </Router>

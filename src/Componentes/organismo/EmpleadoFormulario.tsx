@@ -316,9 +316,9 @@ const styles = {
   avatarContainer: {
     width: '80px',
     height: '80px',
-    borderRadius: '50%',
+    borderRadius: '40%',
     overflow: 'hidden',
-    marginBottom: '10px',
+    marginBottom: '30px',
   },
   avatar: {
     width: '100%',
@@ -438,7 +438,6 @@ const styles = {
   warning: {
     color: 'red',
     fontSize: '12px',
-    marginTop: '5px',
   },
 };
 
