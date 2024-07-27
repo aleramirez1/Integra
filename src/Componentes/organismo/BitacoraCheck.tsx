@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
-import { FaTrash } from 'react-icons/fa'; // Importa el ícono de eliminación de Font Awesome
+import { FaTrash, FaArrowLeft } from 'react-icons/fa'; 
 
 const Container = styled.div<{ expanded: boolean }>`
   max-width: ${({ expanded }) => (expanded ? '100vw' : '800px')};
@@ -19,6 +20,21 @@ const Container = styled.div<{ expanded: boolean }>`
   text-align: center;
   z-index: 1000;
   transition: all 0.3s ease-in-out;
+`;
+
+const BackButton = styled.button`
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 1.5rem;
+  color: #007bb5;
+  position: absolute;
+  top: 1rem;
+  left: 1rem;
+  
+  &:hover {
+    color: #005a80;
+  }
 `;
 
 const HistoryContainer = styled.div`
@@ -199,20 +215,18 @@ const BitacoraCheck: React.FC = () => {
   const [buttonsDisabled, setButtonsDisabled] = useState(true);
   const [savedData, setSavedData] = useState<Array<{ direction: string; unit: string; time: string; day: string }>>([]);
   const [showHistory, setShowHistory] = useState(false);
-  const [unitRegistered, setUnitRegistered] = useState(false); // Estado para verificar si se ha registrado una unidad
+  const [unitRegistered, setUnitRegistered] = useState(false);
+  const navigate = useNavigate(); 
 
-  // Fetch historial de datos al cargar el componente
   useEffect(() => {
-    fetch('/api/getHistory')
-      .then((response) => response.json())
-      .then((data) => setSavedData(data))
-      .catch((error) => console.error('Error fetching history:', error));
   }, []);
 
-  const handleSelectChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
-    const { name, value } = event.target;
+  const handleSelectChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    const { name, value } = e.target;
     if (name === 'unit') {
       setSelectedUnit(value);
+      setUnitRegistered(unitPattern.test(value));
+      setButtonsDisabled(!unitPattern.test(value));
     } else if (name === 'day') {
       setSelectedDay(value);
     }
@@ -220,26 +234,23 @@ const BitacoraCheck: React.FC = () => {
 
   const handleButtonClick = (direction: string) => {
     setSelectedButton(direction);
+    setButtonsDisabled(false);
   };
 
   const handleNewUnit = () => {
-    setButtonsDisabled(false);
-    setMessage('');
-    setSelectedUnit('');
-    setUnitRegistered(true); // Marca la unidad como registrada
   };
 
   const handleSave = () => {
-    if (unitPattern.test(selectedUnit) && selectedButton && unitRegistered && selectedDay) {
+    if (selectedUnit && selectedButton && unitRegistered && selectedDay) {
       const currentTime = new Date().toLocaleTimeString();
       const newData = {
         direction: selectedButton,
         unit: selectedUnit,
         time: currentTime,
-        day: selectedDay, // Usa el día seleccionado
+        day: selectedDay,
       };
 
-      // Enviar los datos al servidor
+     
       fetch('/api/saveData', {
         method: 'POST',
         headers: {
@@ -254,7 +265,7 @@ const BitacoraCheck: React.FC = () => {
           setButtonsDisabled(true);
           setSelectedUnit('');
           setSelectedButton(null);
-          setUnitRegistered(false); // Reinicia el estado de registro de unidad
+          setUnitRegistered(false);
         })
         .catch((error) => {
           console.error('Error saving data:', error);
@@ -304,8 +315,15 @@ const BitacoraCheck: React.FC = () => {
       });
   };
 
+  const handleBack = () => {
+    navigate('/menucheck'); 
+  };
+
   return (
     <Container expanded={showHistory}>
+      <BackButton onClick={handleBack}>
+        <FaArrowLeft />
+      </BackButton>
       {!showHistory ? (
         <>
           <SelectContainer>
