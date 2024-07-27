@@ -13,7 +13,7 @@ import MenuCheck from './Pages/MenuCheck';
 import MapaChecador from './Componentes/organismo/MapaChecador';
 
 const App: React.FC = () => {
-  const isAuthenticated = true; // Aquí deberías conectar con el estado de autenticación real
+  const isAuthenticated = true;
 
   return (
     <Router>
