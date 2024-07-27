@@ -3,10 +3,15 @@ import Swal from 'sweetalert2';
 
 const GOOGLE_MAPS_API_KEY = import.meta.env.VITE_GOOGLE_MAPS_API_KEY;
 
+interface DeviceMarker {
+  id: string;
+  marker: google.maps.Marker;
+}
+
 const MapaChecador: React.FC = () => {
   const mapRef = useRef<HTMLDivElement>(null);
   const [map, setMap] = useState<google.maps.Map | null>(null);
-  const [marker, setMarker] = useState<google.maps.Marker | null>(null);
+  const [deviceMarkers, setDeviceMarkers] = useState<DeviceMarker[]>([]);
   const [buttonColor, setButtonColor] = useState('red');
   const [locationAccessed, setLocationAccessed] = useState(false);
 
@@ -74,10 +79,8 @@ const MapaChecador: React.FC = () => {
       }).then((result) => {
         if (result.dismiss === Swal.DismissReason.cancel) {
           // Desactivar
-          if (marker) {
-            marker.setMap(null);
-            setMarker(null);
-          }
+          deviceMarkers.forEach((device) => device.marker.setMap(null));
+          setDeviceMarkers([]);
           setButtonColor('red');
           setLocationAccessed(false);
         }
@@ -105,16 +108,18 @@ const MapaChecador: React.FC = () => {
                 const google = (window as any).google as typeof google.maps;
 
                 if (google) {
-                  if (marker) {
-                    marker.setPosition(new google.maps.LatLng(latitude, longitude));
-                  } else {
-                    const newMarker = new google.maps.Marker({
-                      position: new google.maps.LatLng(latitude, longitude),
-                      map: map,
-                      title: 'Tu ubicación actual',
-                    });
-                    setMarker(newMarker);
-                  }
+                  // Agregar un nuevo marcador
+                  const newMarker = new google.maps.Marker({
+                    position: new google.maps.LatLng(latitude, longitude),
+                    map: map,
+                    title: `Ubicación del dispositivo ${deviceMarkers.length + 1}`,
+                  });
+
+                  // Actualizar el estado con el nuevo marcador
+                  setDeviceMarkers((prevMarkers) => [
+                    ...prevMarkers,
+                    { id: `device-${prevMarkers.length + 1}`, marker: newMarker },
+                  ]);
 
                   map.setCenter(new google.maps.LatLng(latitude, longitude));
                   setButtonColor('green'); // Cambiar color a verde
@@ -210,9 +215,10 @@ const MapaChecador: React.FC = () => {
           border: 'none',
           borderRadius: '5px',
           cursor: 'pointer',
+          fontSize: '16px',
         }}
       >
-        Activar Localización
+        Activar Ubicación
       </button>
     </div>
   );
