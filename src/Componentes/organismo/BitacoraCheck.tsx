@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import styled from 'styled-components';
 import { FaTrash } from 'react-icons/fa'; // Importa el ícono de eliminación de Font Awesome
 
@@ -201,6 +201,14 @@ const BitacoraCheck: React.FC = () => {
   const [showHistory, setShowHistory] = useState(false);
   const [unitRegistered, setUnitRegistered] = useState(false); // Estado para verificar si se ha registrado una unidad
 
+  // Fetch historial de datos al cargar el componente
+  useEffect(() => {
+    fetch('/api/getHistory')
+      .then((response) => response.json())
+      .then((data) => setSavedData(data))
+      .catch((error) => console.error('Error fetching history:', error));
+  }, []);
+
   const handleSelectChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
     const { name, value } = event.target;
     if (name === 'unit') {
@@ -231,12 +239,27 @@ const BitacoraCheck: React.FC = () => {
         day: selectedDay, // Usa el día seleccionado
       };
 
-      setSavedData([...savedData, newData]);
-      setMessage('Datos guardados exitosamente.');
-      setButtonsDisabled(true);
-      setSelectedUnit('');
-      setSelectedButton(null);
-      setUnitRegistered(false); // Reinicia el estado de registro de unidad
+      // Enviar los datos al servidor
+      fetch('/api/saveData', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(newData),
+      })
+        .then((response) => response.json())
+        .then((data) => {
+          setSavedData([...savedData, newData]);
+          setMessage('Datos guardados exitosamente.');
+          setButtonsDisabled(true);
+          setSelectedUnit('');
+          setSelectedButton(null);
+          setUnitRegistered(false); // Reinicia el estado de registro de unidad
+        })
+        .catch((error) => {
+          console.error('Error saving data:', error);
+          setMessage('Error al guardar los datos.');
+        });
     } else {
       setMessage('Por favor, complete todos los campos antes de guardar.');
     }
@@ -247,14 +270,38 @@ const BitacoraCheck: React.FC = () => {
   };
 
   const handleClearHistory = () => {
-    setSavedData([]);
-    setMessage('Historial limpiado.');
+    fetch('/api/clearHistory', { method: 'DELETE' })
+      .then((response) => response.json())
+      .then(() => {
+        setSavedData([]);
+        setMessage('Historial limpiado.');
+      })
+      .catch((error) => {
+        console.error('Error clearing history:', error);
+        setMessage('Error al limpiar el historial.');
+      });
   };
 
   const handleDelete = (index: number) => {
-    const newSavedData = savedData.filter((_, i) => i !== index);
-    setSavedData(newSavedData);
-    setMessage('Registro eliminado.');
+    const recordToDelete = savedData[index];
+    
+    fetch('/api/deleteRecord', {
+      method: 'DELETE',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(recordToDelete),
+    })
+      .then((response) => response.json())
+      .then(() => {
+        const newSavedData = savedData.filter((_, i) => i !== index);
+        setSavedData(newSavedData);
+        setMessage('Registro eliminado.');
+      })
+      .catch((error) => {
+        console.error('Error deleting record:', error);
+        setMessage('Error al eliminar el registro.');
+      });
   };
 
   return (
@@ -326,7 +373,7 @@ const BitacoraCheck: React.FC = () => {
                 <TableHeader>Unidad</TableHeader>
                 <TableHeader>Hora</TableHeader>
                 <TableHeader>Día</TableHeader>
-                <TableHeader>Eliminar</TableHeader> {/* Nueva columna para eliminar */}
+                <TableHeader>Eliminar</TableHeader>
               </tr>
             </thead>
             <tbody>
