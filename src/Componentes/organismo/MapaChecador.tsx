@@ -26,6 +26,29 @@ const MapaChecador: React.FC = () => {
               zoom: 12,
             });
             setMap(mapInstance);
+
+            // Agregar la ruta (Polyline)
+            const rutaCoords = [
+              { lat: 16.61499822993647, lng: -93.09168841669339 },
+              { lat: 16.61783442568243, lng: -93.09497707754001 },
+              { lat: 16.618779814953527, lng: -93.09826573838663 },
+              { lat: 16.618149555956766, lng: -93.09991006880993 },
+              { lat: 16.620985705146364, lng: -93.09991006880993 },
+              { lat: 16.622876447991274, lng: -93.09958120272526 },
+              { lat: 16.624136932872783, lng: -93.09859460447127 },
+              { lat: 16.626027644671016, lng: -93.0992523366406 },
+              { lat: 16.630439233078352, lng: -93.09892347055593 },
+              { lat: 16.633590305540118, lng: -93.09464821145534 },
+            ];
+
+            const ruta = new google.maps.Polyline({
+              path: rutaCoords,
+              geodesic: true,
+              strokeColor: '#FF0000',
+              strokeOpacity: 1.0,
+              strokeWeight: 2,
+            });
+            ruta.setMap(mapInstance);
           } else {
             console.error('Google Maps no está disponible.');
           }
@@ -76,6 +99,7 @@ const MapaChecador: React.FC = () => {
           navigator.geolocation.watchPosition(
             (position) => {
               const { latitude, longitude } = position.coords;
+              console.log(`Latitud: ${latitude}, Longitud: ${longitude}`); // Imprime en consola
 
               if (map) {
                 const google = (window as any).google as typeof google.maps;
