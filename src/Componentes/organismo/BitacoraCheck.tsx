@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import styled from 'styled-components';
+import { FaTrash } from 'react-icons/fa'; // Importa el ícono de eliminación de Font Awesome
 
 const Container = styled.div<{ expanded: boolean }>`
   max-width: ${({ expanded }) => (expanded ? '100vw' : '800px')};
@@ -176,6 +177,18 @@ const TableData = styled.td`
   border: 1px solid #007bb5;
 `;
 
+const DeleteButton = styled.button`
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: #ff0000;
+  font-size: 1.2rem;
+  
+  &:hover {
+    color: #cc0000;
+  }
+`;
+
 const unitPattern = /^(01|02|04|05|06|07|08|013|015|016|017|021)$/;
 
 const BitacoraCheck: React.FC = () => {
@@ -204,7 +217,7 @@ const BitacoraCheck: React.FC = () => {
   const handleNewUnit = () => {
     setButtonsDisabled(false);
     setMessage('');
-    setSelectedButton(null);
+    setSelectedUnit('');
     setUnitRegistered(true); // Marca la unidad como registrada
   };
 
@@ -236,6 +249,12 @@ const BitacoraCheck: React.FC = () => {
   const handleClearHistory = () => {
     setSavedData([]);
     setMessage('Historial limpiado.');
+  };
+
+  const handleDelete = (index: number) => {
+    const newSavedData = savedData.filter((_, i) => i !== index);
+    setSavedData(newSavedData);
+    setMessage('Registro eliminado.');
   };
 
   return (
@@ -306,7 +325,8 @@ const BitacoraCheck: React.FC = () => {
                 <TableHeader>Dirección</TableHeader>
                 <TableHeader>Unidad</TableHeader>
                 <TableHeader>Hora</TableHeader>
-                <TableHeader>Día</TableHeader> {/* Nueva columna para el día */}
+                <TableHeader>Día</TableHeader>
+                <TableHeader>Eliminar</TableHeader> {/* Nueva columna para eliminar */}
               </tr>
             </thead>
             <tbody>
@@ -315,7 +335,12 @@ const BitacoraCheck: React.FC = () => {
                   <TableData>{data.direction}</TableData>
                   <TableData>{data.unit}</TableData>
                   <TableData>{data.time}</TableData>
-                  <TableData>{data.day}</TableData> {/* Mostrar el día */}
+                  <TableData>{data.day}</TableData>
+                  <TableData>
+                    <DeleteButton onClick={() => handleDelete(index)}>
+                      <FaTrash />
+                    </DeleteButton>
+                  </TableData>
                 </tr>
               ))}
             </tbody>
